@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useDialog } from '../context/DialogContext';
+import html2pdf from 'html2pdf.js';
 
 export default function Reports({ setActiveTab }) {
-  const { showAlert, showPrompt } = useDialog();
+  const { showAlert, showPrompt, showToast } = useDialog();
   const [hoveredMonth, setHoveredMonth] = useState(null);
   const [tickerIndex, setTickerIndex] = useState(0);
   const [selectedRange, setSelectedRange] = useState('May 1, 2025 - May 31, 2025');
@@ -44,7 +45,18 @@ export default function Reports({ setActiveTab }) {
   }, []);
 
   const handleExport = () => {
-    showAlert(`Exporting analytical report for range: ${selectedRange}`);
+    showToast('Preparing report for download...');
+    const element = document.querySelector('.reports-canvas');
+    const opt = {
+      margin:       0.3,
+      filename:     `Analytical_Report.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'a3', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save().then(() => {
+      showToast('Analytical report exported successfully.');
+    });
   };
 
   const handleSelectRange = async () => {
@@ -53,7 +65,7 @@ export default function Reports({ setActiveTab }) {
   };
 
   return (
-    <div className="space-y-6 relative">
+    <div className="space-y-6 relative reports-canvas">
 
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2">
         <div>
@@ -142,7 +154,7 @@ export default function Reports({ setActiveTab }) {
         <div className="lg:col-span-2 bento-card p-6 rounded-xl flex flex-col hover:translate-y-[-2px]">
           <div className="flex justify-between items-center mb-6">
             <h4 className="font-title-sm text-title-sm text-on-surface">Spending by Category</h4>
-            <button onClick={() => showAlert('Category options')} className="text-on-surface-variant hover:text-primary transition-colors">
+            <button onClick={() => showToast('Categories loaded.')} className="text-on-surface-variant hover:text-primary transition-colors">
               <span className="material-symbols-outlined">more_vert</span>
             </button>
           </div>
@@ -276,7 +288,7 @@ export default function Reports({ setActiveTab }) {
 
           <div className="flex gap-2 mt-6">
             <button onClick={() => setActiveTab('Activity')} className="flex-1 py-2 bg-surface-container-highest text-on-surface text-body-sm font-bold rounded hover:bg-surface-bright transition-all">Audit Logs</button>
-            <button onClick={() => showAlert('Opening full forecast PDF report...')} className="flex-1 py-2 bg-primary/20 text-primary text-body-sm font-bold rounded hover:bg-primary/30 transition-all">Full Report</button>
+            <button onClick={() => showToast('Opening full forecast PDF report...')} className="flex-1 py-2 bg-primary/20 text-primary text-body-sm font-bold rounded hover:bg-primary/30 transition-all">Full Report</button>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDialog } from '../context/DialogContext';
 
 export default function RFQContainer({ setActiveTab }) {
-  const { showAlert, showPrompt } = useDialog();
+  const { showAlert, showPrompt, showToast } = useDialog();
   const [step, setStep] = useState(1);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
@@ -101,7 +101,7 @@ export default function RFQContainer({ setActiveTab }) {
       });
       const resData = await res.json();
       if (res.ok) {
-        showAlert(isDraft ? 'RFQ Saved as Draft successfully!' : `RFQ '${title}' created and published successfully!`);
+        showToast(isDraft ? 'RFQ Saved as Draft successfully!' : `RFQ '${title}' created and published successfully!`);
         setTitle('');
         setCategory('');
         setDeadline('');
@@ -142,7 +142,7 @@ export default function RFQContainer({ setActiveTab }) {
           onClick={() => setStep(1)} 
           className="relative z-10 flex flex-col items-center gap-2 group focus:outline-none"
         >
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step >= 1 ? 'step-active text-on-primary' : 'bg-surface-container-highest border border-outline-variant text-on-surface-variant'}`}>1</div>
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step >= 1 ? 'step-active bg-primary text-on-primary' : 'bg-surface-container-highest border border-outline-variant text-on-surface-variant'}`}>1</div>
           <span className={`text-[11px] font-label-caps ${step >= 1 ? 'text-primary' : 'text-on-surface-variant'}`}>DETAILS</span>
         </button>
 
@@ -153,7 +153,7 @@ export default function RFQContainer({ setActiveTab }) {
           }} 
           className="relative z-10 flex flex-col items-center gap-2 group focus:outline-none"
         >
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step >= 2 ? 'step-active text-on-primary' : 'bg-surface-container-highest border border-outline-variant text-on-surface-variant'}`}>2</div>
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step >= 2 ? 'step-active bg-primary text-on-primary' : 'bg-surface-container-highest border border-outline-variant text-on-surface-variant'}`}>2</div>
           <span className={`text-[11px] font-label-caps ${step >= 2 ? 'text-primary' : 'text-on-surface-variant'}`}>ITEMS</span>
         </button>
 
@@ -164,7 +164,7 @@ export default function RFQContainer({ setActiveTab }) {
           }} 
           className="relative z-10 flex flex-col items-center gap-2 group focus:outline-none"
         >
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step >= 3 ? 'step-active text-on-primary' : 'bg-surface-container-highest border border-outline-variant text-on-surface-variant'}`}>3</div>
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step >= 3 ? 'step-active bg-primary text-on-primary' : 'bg-surface-container-highest border border-outline-variant text-on-surface-variant'}`}>3</div>
           <span className={`text-[11px] font-label-caps ${step >= 3 ? 'text-primary' : 'text-on-surface-variant'}`}>VENDORS</span>
         </button>
       </div>

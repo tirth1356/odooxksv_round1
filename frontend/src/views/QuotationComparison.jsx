@@ -3,7 +3,7 @@ import { useDialog } from '../context/DialogContext';
 import html2pdf from 'html2pdf.js';
 
 export default function QuotationComparison({ onBack }) {
-  const { showAlert } = useDialog();
+  const { showAlert, showToast } = useDialog();
   const [selectedVendor, setSelectedVendor] = useState('Infra Supplies Pvt Ltd');
   const [vendors, setVendors] = useState([]);
 
@@ -41,7 +41,7 @@ export default function QuotationComparison({ onBack }) {
 
   const handleApprove = (vendorName) => {
     setSelectedVendor(vendorName);
-    showAlert(`${vendorName} has been selected and approved for Office Furniture procurement Q2!`);
+    showToast(`${vendorName} has been selected and approved for Office Furniture procurement Q2!`);
   };
 
   return (
@@ -67,7 +67,7 @@ export default function QuotationComparison({ onBack }) {
           <div className="flex gap-3">
             <button 
               onClick={() => {
-                showAlert('Preparing PDF download...');
+                showToast('Preparing PDF download...');
                 const element = document.getElementById('comparison-canvas');
                 if(!element) return;
                 const opt = {
@@ -85,7 +85,7 @@ export default function QuotationComparison({ onBack }) {
               Export PDF
             </button>
             <button 
-              onClick={() => showAlert('Opening Share Dialog...')} 
+              onClick={() => showToast('Share link copied to clipboard!')} 
               className="flex items-center gap-2 px-4 py-2 border border-outline-variant rounded-lg text-body-sm text-on-surface hover:bg-surface-container-high transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">share</span>

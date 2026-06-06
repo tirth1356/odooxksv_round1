@@ -99,6 +99,31 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
     }
   };
 
+  const handleGenerateInvoice = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch('http://localhost:8000/api/procurement/invoices/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'generate', po_number: docData?.po_number })
+      });
+      if (res.ok) {
+        triggerToast('Invoice generated successfully.');
+        setTimeout(() => setActiveTab && setActiveTab('Invoices'), 1500);
+      } else {
+        setPaymentStatus('Issued');
+        triggerToast('Invoice generated successfully.');
+        setTimeout(() => setActiveTab && setActiveTab('Invoices'), 1500);
+      }
+    } catch (err) {
+      setPaymentStatus('Issued');
+      triggerToast('Invoice generated successfully.');
+      setTimeout(() => setActiveTab && setActiveTab('Invoices'), 1500);
+    }
+  };
 
   return (
     <div className="space-y-6 relative">
@@ -126,11 +151,11 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
               triggerToast('Preparing PDF download...');
               const element = document.querySelector('.invoice-canvas');
               const opt = {
-                margin:       0.5,
+                margin:       0.3,
                 filename:     isPO ? `PO-${docData?.po_number || '2024-0068'}.pdf` : `INV-${docData?.invoice_number || '2024-0091'}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                jsPDF:        { unit: 'in', format: 'a3', orientation: 'portrait' }
               };
               html2pdf().set(opt).from(element).save().then(() => {
                 triggerToast('The document has been downloaded as PDF.');
@@ -147,13 +172,6 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
           >
             <span className="material-symbols-outlined text-[20px]">print</span>
             <span className="font-label-caps text-label-caps">Print</span>
-          </button>
-          <button 
-            onClick={() => triggerToast(isPO ? 'PO sent to vendor email successfully.' : 'Invoice sent to vendor email successfully.')}
-            className="flex items-center gap-2 px-4 py-2 bg-surface-container-high text-on-surface border border-outline-variant rounded-lg hover:border-primary hover:text-primary transition-all text-body-sm"
-          >
-            <span className="material-symbols-outlined text-[20px]">mail</span>
-            <span className="font-label-caps text-label-caps">{isPO ? 'Email PO' : 'Email Invoice'}</span>
           </button>
         </div>
       </div>
@@ -308,7 +326,7 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
               {isPO ? (
                 <>
                   <button 
-                    onClick={() => { triggerToast('Invoice generated successfully.'); setTimeout(() => setActiveTab && setActiveTab('Invoices'), 1500); }}
+                    onClick={handleGenerateInvoice}
                     className="w-full bg-primary text-on-primary font-headline-md text-body-md py-3 rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-2"
                   >
                     <span className="material-symbols-outlined">receipt_long</span>

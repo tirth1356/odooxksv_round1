@@ -381,8 +381,7 @@ export default function VendorMgmt() {
           </div>
           <p className="text-body-md text-on-surface mb-4">Insurance documentation for 'FastLog Transport' and 2 others will expire in the next 15 days.</p>
           <div className="flex gap-2">
-            <button onClick={() => showAlert('Sending notification email to compliant contacts...')} className="flex-1 bg-error-container/20 text-error py-2 rounded font-bold text-[12px] hover:bg-error-container/40 transition-all">Send Notifications</button>
-            <button onClick={() => showAlert('Opening Compliance Document Vault...')} className="flex-1 bg-surface-container-highest border border-outline-variant text-on-surface py-2 rounded font-bold text-[12px] hover:bg-surface-container-low transition-all">Review Docs</button>
+            <button onClick={() => showAlert('Opening vendor compliance history...')} className="flex-1 bg-surface-container border border-outline-variant text-on-surface py-2 rounded font-bold text-[12px] hover:bg-surface-container-high transition-all">History</button>
           </div>
         </div>
       </div>

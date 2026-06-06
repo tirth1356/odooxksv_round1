@@ -17,6 +17,14 @@ export function DialogProvider({ children }) {
   });
 
   const [promptValue, setPromptValue] = useState('');
+  const [toastMessage, setToastMessage] = useState(null);
+
+  const showToast = (message, duration = 3000) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, duration);
+  };
 
   const showAlert = (message, title = 'Notification') => {
     return new Promise((resolve) => {
@@ -59,8 +67,14 @@ export function DialogProvider({ children }) {
   };
 
   return (
-    <DialogContext.Provider value={{ showAlert, showPrompt }}>
+    <DialogContext.Provider value={{ showAlert, showPrompt, showToast }}>
       {children}
+      
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-[200] bg-surface-container-highest border border-outline-variant text-on-surface px-6 py-3 rounded-xl shadow-2xl animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <p className="font-body-md font-semibold text-[14px]">{toastMessage}</p>
+        </div>
+      )}
       
       {dialogState.isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">

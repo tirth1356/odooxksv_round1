@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDialog } from '../context/DialogContext';
 
 export default function Quotations({ onBackToRFQs, onCompare }) {
-  const { showAlert, showPrompt } = useDialog();
+  const { showAlert, showPrompt, showToast } = useDialog();
   const [taxRate, setTaxRate] = useState(18); // 18%
   const [validity, setValidity] = useState('30 Days');
   const [paymentTerms, setPaymentTerms] = useState('Payment terms: 20 days net. Standard 1-year warranty included for all furniture items. Shipping included in the quoted price.');
@@ -95,11 +95,17 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
         body: JSON.stringify(quoteData)
       });
       if (res.ok) {
-        showAlert(isDraft ? 'Quotation Draft Saved!' : 'Quotation Submitted Successfully!');
-        setLineItems([]);
-        setTaxRate(18);
-        setValidity('30 Days');
-        setPaymentTerms('Payment terms: 20 days net. Standard 1-year warranty included for all furniture items. Shipping included in the quoted price.');
+        showToast(isDraft ? 'Quotation Draft Saved!' : 'Quotation Submitted Successfully!');
+        if (onBackToRFQs && !isDraft) {
+          setTimeout(() => {
+            onBackToRFQs();
+          }, 1500);
+        } else {
+          setLineItems([]);
+          setTaxRate(18);
+          setValidity('30 Days');
+          setPaymentTerms('Payment terms: 20 days net. Standard 1-year warranty included for all furniture items. Shipping included in the quoted price.');
+        }
       } else {
         const errorData = await res.json();
         showAlert('Error submitting quotation: ' + JSON.stringify(errorData));
@@ -196,7 +202,7 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
                         />
                       </td>
                       <td className="px-cell-padding-h py-4 font-table-data text-table-data text-on-surface">
-                        ${(item.qty * item.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        ₹{(item.qty * item.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                       <td className="px-cell-padding-h py-4 text-right">
                         <input
@@ -296,11 +302,11 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
             <div className="space-y-4">
               <div className="flex justify-between items-center text-on-surface-variant">
                 <span>Subtotal</span>
-                <span className="font-mono text-on-surface">${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="font-mono text-on-surface">₹{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between items-center text-on-surface-variant">
                 <span>GST ({taxRate}%)</span>
-                <span className="font-mono text-on-surface">${gstAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                <span className="font-mono text-on-surface">₹{gstAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between items-center text-on-surface-variant">
                 <span>Shipping &amp; Handling</span>
@@ -310,7 +316,7 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
                 <div className="flex justify-between items-baseline animate-pulse">
                   <span className="text-title-sm font-bold text-on-surface">Grand Total</span>
                   <span className="text-headline-md font-mono text-primary-fixed">
-                    ${grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    ₹{grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
                 <p className="text-[10px] font-label-caps text-on-surface-variant mt-1 text-right italic">All prices in INR</p>

@@ -57,7 +57,7 @@ export default function Dashboard({ userRole, onLogout }) {
     { name: 'Quotations', icon: 'receipt_long', roles: ['Procurement Officer', 'Vendor'] },
     { name: 'Approvals', icon: 'fact_check', roles: ['Manager'] },
     { name: 'Purchase Orders', icon: 'shopping_cart', roles: ['Procurement Officer', 'Vendor', 'Manager'] },
-    { name: 'Invoices', icon: 'description', roles: ['Procurement Officer', 'Vendor'] },
+    { name: 'Invoices', icon: 'description', roles: ['Procurement Officer', 'Vendor', 'Manager'] },
     { name: 'Reports', icon: 'analytics', roles: ['Admin'] },
     { name: 'Activity', icon: 'history', roles: ['Procurement Officer', 'Manager', 'Admin'] },
   ];
@@ -153,18 +153,6 @@ export default function Dashboard({ userRole, onLogout }) {
                 <span className="material-symbols-outlined">notifications</span>
                 <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
               </button>
-              <button 
-                onClick={() => showAlert('Settings Panel')}
-                className="hover:bg-surface-container-highest/50 p-2 rounded-lg transition-colors"
-              >
-                <span className="material-symbols-outlined">settings</span>
-              </button>
-              <button 
-                onClick={() => showAlert('Help & Documentation')}
-                className="hover:bg-surface-container-highest/50 p-2 rounded-lg transition-colors"
-              >
-                <span className="material-symbols-outlined">help</span>
-              </button>
             </div>
           </div>
         </header>
@@ -173,7 +161,7 @@ export default function Dashboard({ userRole, onLogout }) {
           <div className="mb-8">
             <h1 className="font-headline-md text-headline-md text-on-surface mb-1">{activeTab}</h1>
             <p className="font-body-md text-body-md text-on-surface-variant">
-              Welcome back, Procurement Officer — Here is today's overview across your supply chain.
+              Welcome back, {userRole} — Here is today's overview across your supply chain.
             </p>
           </div>
 
@@ -355,27 +343,33 @@ export default function Dashboard({ userRole, onLogout }) {
 
               <div className="mt-8 pt-8 border-t border-outline-variant flex flex-wrap gap-4 items-center">
                 <span className="text-label-caps font-label-caps text-on-surface-variant mr-4 uppercase">Quick Actions</span>
-                <button 
-                  onClick={() => setActiveTab('RFQs')}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-primary/40 hover:bg-primary/5 transition-all text-primary font-bold text-body-sm"
-                >
-                  <span className="material-symbols-outlined text-[20px]">add</span>
-                  New RFQ
-                </button>
-                <button 
-                  onClick={() => setActiveTab('Vendors')}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-outline-variant hover:bg-surface-container-high transition-all text-on-surface font-bold text-body-sm"
-                >
-                  <span className="material-symbols-outlined text-[20px]">person_add</span>
-                  Add Vendor
-                </button>
-                <button 
-                  onClick={() => setActiveTab('Invoices')}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-outline-variant hover:bg-surface-container-high transition-all text-on-surface font-bold text-body-sm"
-                >
-                  <span className="material-symbols-outlined text-[20px]">description</span>
-                  View Invoices
-                </button>
+                {['Procurement Officer', 'Manager'].includes(userRole) && (
+                  <button 
+                    onClick={() => setActiveTab('RFQs')}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-primary/40 hover:bg-primary/5 transition-all text-primary font-bold text-body-sm"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">add</span>
+                    New RFQ
+                  </button>
+                )}
+                {['Procurement Officer', 'Admin'].includes(userRole) && (
+                  <button 
+                    onClick={() => setActiveTab('Vendors')}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-outline-variant hover:bg-surface-container-high transition-all text-on-surface font-bold text-body-sm"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">person_add</span>
+                    Add Vendor
+                  </button>
+                )}
+                {['Procurement Officer', 'Vendor'].includes(userRole) && (
+                  <button 
+                    onClick={() => setActiveTab('Invoices')}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-outline-variant hover:bg-surface-container-high transition-all text-on-surface font-bold text-body-sm"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">description</span>
+                    View Invoices
+                  </button>
+                )}
               </div>
             </>
           ) : activeTab === 'Vendors' ? (

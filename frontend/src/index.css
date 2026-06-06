@@ -2,18 +2,18 @@
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 .glass-surface {
-  background: rgba(30, 41, 59, 0.6);
+  background: rgba(152, 134, 134, 0.6);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(78, 222, 163, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 .input-focus-glow:focus-within {
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
 }
 .auth-bg {
-  background: radial-gradient(circle at 0% 0%, #131b2e 0%, #0b1326 100%);
+  background: radial-gradient(circle at 0% 0%, #D1D0D0 0%, #988686 100%);
 }
 .step-active {
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
 }
 @keyframes float {
   0% { transform: translateY(0px); }
@@ -22,4 +22,8 @@
 }
 .float-anim {
   animation: float 6s ease-in-out infinite;
+}
+
+button, .btn {
+  border-radius: 9999px !important;
 }

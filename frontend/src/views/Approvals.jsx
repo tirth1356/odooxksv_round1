@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDialog } from '../context/DialogContext';
 
 export default function Approvals({ setActiveTab }) {
-  const { showAlert } = useDialog();
+  const { showAlert, showToast } = useDialog();
   const [status, setStatus] = useState('L2 Pending'); // 'L2 Pending', 'Approved', 'Rejected'
   const [remarks, setRemarks] = useState('');
   const [approvalChain, setApprovalChain] = useState([]);
@@ -45,7 +45,7 @@ export default function Approvals({ setActiveTab }) {
         setStatus(responseData.data.status);
         setRemarks(responseData.data.remarks || '');
         setApprovalChain(responseData.data.approval_chain || []);
-        showAlert('Quotation L2 approved successfully! Forwarded to David Chen for final review.');
+        showToast('Quotation L2 approved successfully! Forwarded to David Chen for final review.');
       } else {
         showAlert('Error approving quotation.');
       }
@@ -70,7 +70,7 @@ export default function Approvals({ setActiveTab }) {
         setStatus(responseData.data.status);
         setRemarks(responseData.data.remarks || '');
         setApprovalChain(responseData.data.approval_chain || []);
-        showAlert('Quotation has been rejected with comments: "' + remarks + '"');
+        showToast('Quotation has been rejected with comments: "' + remarks + '"');
       } else {
         showAlert('Error rejecting quotation.');
       }

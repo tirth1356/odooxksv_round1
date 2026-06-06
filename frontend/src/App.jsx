@@ -132,7 +132,13 @@ export default function App() {
         setScreen('login');
         setRegStep(1);
       } else {
-        setAuthError(JSON.stringify(data));
+        let errorMsg = '';
+        if (typeof data === 'object' && data !== null) {
+          errorMsg = Object.entries(data).map(([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}: ${Array.isArray(v) ? v[0] : v}`).join(' | ');
+        } else {
+          errorMsg = String(data);
+        }
+        setAuthError(errorMsg);
       }
     } catch (err) {
       setAuthError('Network error connecting to backend.');
@@ -453,11 +459,11 @@ export default function App() {
                       onChange={(e) => setRegTerms(e.target.checked)}
                     />
                     <label className="font-body-sm text-body-sm text-on-surface-variant" htmlFor="terms">
-                      I agree to the <a className="text-primary hover:underline" href="#" onClick={(e) => { e.preventDefault(); showAlert('Enterprise Terms of Service agreement details.'); }}>Enterprise Terms of Service</a> and <a className="text-primary hover:underline" href="#" onClick={(e) => { e.preventDefault(); showAlert('Data Privacy Policy details.'); }}>Data Privacy Policy</a>.
+                      I agree to the <span className="text-primary">Enterprise Terms of Service</span> and <span className="text-primary">Data Privacy Policy</span>.
                     </label>
                   </div>
 
-                  <div className="flex gap-4 w-full md:w-auto ml-auto">
+                  <div className="flex flex-wrap gap-4 w-full md:w-auto ml-auto">
                     {regStep > 1 && (
                       <button
                         type="button"
