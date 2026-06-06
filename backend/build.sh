@@ -11,4 +11,4 @@ echo "Running migrations..."
 python manage.py migrate
 
 # Optional: seed db on first deploy. To run this, uncomment the line below:
-# python manage.py seed_db
+python manage.py seed_db
