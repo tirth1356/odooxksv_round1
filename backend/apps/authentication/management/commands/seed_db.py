@@ -105,38 +105,46 @@ class Command(BaseCommand):
         vendor_user = created_users.get('vendor')
 
         # ── Seed Vendors ────────────────────────────────────────────
-        v1 = Vendor.objects.create(
+        v1, _ = Vendor.objects.update_or_create(
             user=vendor_user,
-            vendor_name="Acme Corporation",
-            category="Heavy Machinery",
-            gst_no="27AABCS1429Bz0",
-            contact_no="+1-555-0198",
-            status="Active",
-            rating=Decimal("4.90"),
+            defaults={
+                'vendor_name': "Acme Corporation",
+                'category': "Heavy Machinery",
+                'gst_no': "27AABCS1429Bz0",
+                'contact_no': "+1-555-0198",
+                'status': "Active",
+                'rating': Decimal("4.90"),
+            }
         )
-        v2 = Vendor.objects.create(
+        v2, _ = Vendor.objects.update_or_create(
             vendor_name="Global Tech Solutions",
-            category="IT Infrastructure",
-            gst_no="27AABCS1429Bz1",
-            contact_no="+1-555-0199",
-            status="Active",
-            rating=Decimal("4.80"),
+            defaults={
+                'category': "IT Infrastructure",
+                'gst_no': "27AABCS1429Bz1",
+                'contact_no': "+1-555-0199",
+                'status': "Active",
+                'rating': Decimal("4.80"),
+            }
         )
-        v3 = Vendor.objects.create(
+        v3, _ = Vendor.objects.update_or_create(
             vendor_name="Stark Industries",
-            category="Defense & Aerospace",
-            gst_no="27AABCS1429Bz2",
-            contact_no="+1-555-0200",
-            status="Pending",
-            rating=Decimal("4.95"),
+            defaults={
+                'category': "Defense & Aerospace",
+                'gst_no': "27AABCS1429Bz2",
+                'contact_no': "+1-555-0200",
+                'status': "Pending",
+                'rating': Decimal("4.95"),
+            }
         )
-        v4 = Vendor.objects.create(
+        v4, _ = Vendor.objects.update_or_create(
             vendor_name="Wayne Enterprises Logistics",
-            category="Logistics",
-            gst_no="27AABCS1429Bz3",
-            contact_no="+1-555-0201",
-            status="Blocked",
-            rating=Decimal("3.20"),
+            defaults={
+                'category': "Logistics",
+                'gst_no': "27AABCS1429Bz3",
+                'contact_no': "+1-555-0201",
+                'status': "Blocked",
+                'rating': Decimal("3.20"),
+            }
         )
         self.stdout.write(self.style.SUCCESS("Seeded 4 vendors."))
 
