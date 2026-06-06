@@ -11,8 +11,31 @@ export default function RFQContainer({ setActiveTab }) {
 
   const [lineItems, setLineItems] = useState([]);
   const [assignedVendors, setAssignedVendors] = useState([]);
-
   const [attachments, setAttachments] = useState([]);
+
+  const validateStep1 = () => {
+    if (!title.trim()) {
+      showAlert("RFQ Title is required.");
+      return false;
+    }
+    if (!category) {
+      showAlert("Please select a Category.");
+      return false;
+    }
+    if (!deadline) {
+      showAlert("Deadline is required.");
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep2 = () => {
+    if (lineItems.length === 0) {
+      showAlert("Please add at least one line item to the RFQ before proceeding.");
+      return false;
+    }
+    return true;
+  };
 
   const handleDeleteItem = (id) => {
     setLineItems(lineItems.filter(item => item.id !== id));
@@ -53,6 +76,9 @@ export default function RFQContainer({ setActiveTab }) {
   };
 
   const handleSave = async (isDraft) => {
+    if (!validateStep1()) return;
+    if (!isDraft && !validateStep2()) return;
+
     const data = {
       title,
       category,
@@ -121,7 +147,10 @@ export default function RFQContainer({ setActiveTab }) {
         </button>
 
         <button 
-          onClick={() => setStep(2)} 
+          onClick={() => {
+            if (step === 3) setStep(2);
+            else if (step === 1 && validateStep1()) setStep(2);
+          }} 
           className="relative z-10 flex flex-col items-center gap-2 group focus:outline-none"
         >
           <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step >= 2 ? 'step-active text-on-primary' : 'bg-surface-container-highest border border-outline-variant text-on-surface-variant'}`}>2</div>
@@ -129,7 +158,10 @@ export default function RFQContainer({ setActiveTab }) {
         </button>
 
         <button 
-          onClick={() => setStep(3)} 
+          onClick={() => {
+            if (step === 1 && validateStep1() && validateStep2()) setStep(3);
+            else if (step === 2 && validateStep2()) setStep(3);
+          }} 
           className="relative z-10 flex flex-col items-center gap-2 group focus:outline-none"
         >
           <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step >= 3 ? 'step-active text-on-primary' : 'bg-surface-container-highest border border-outline-variant text-on-surface-variant'}`}>3</div>
@@ -137,197 +169,250 @@ export default function RFQContainer({ setActiveTab }) {
         </button>
       </div>
 
-      <div className="grid grid-cols-12 gap-stack-gap">
-
-        <div className="col-span-12 lg:col-span-5 space-y-6">
-          <div className="bg-surface-container p-6 rounded-xl border border-outline-variant/30 backdrop-blur-sm relative">
-            <h3 className="text-title-sm font-headline-md mb-6 flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">info</span>
-              General Information
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-[11px] font-label-caps text-on-surface-variant mb-1 ml-1 uppercase">RFQ Title*</label>
-                <input
-                  className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all outline-none text-on-surface"
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+      <div className="max-w-4xl mx-auto">
+        {step === 1 && (
+          <div className="max-w-xl mx-auto space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="bg-surface-container p-6 rounded-xl border border-outline-variant/30 backdrop-blur-sm relative">
+              <h3 className="text-title-sm font-headline-md mb-6 flex items-center gap-2 text-on-surface">
+                <span className="material-symbols-outlined text-primary">info</span>
+                General Information
+              </h3>
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-[11px] font-label-caps text-on-surface-variant mb-1 ml-1 uppercase">Category</label>
-                  <select
-                    className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-primary outline-none text-on-surface"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    required
-                  >
-                    <option value="" disabled>Select Category</option>
-                    <option value="Furniture">Furniture</option>
-                    <option value="IT Hardware">IT Hardware</option>
-                    <option value="Software">Software</option>
-                    <option value="Stationery">Stationery</option>
-                    <option value="Logistics">Logistics</option>
-                    <option value="Construction">Construction</option>
-                    <option value="Consulting">Consulting</option>
-                    <option value="Raw Materials">Raw Materials</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[11px] font-label-caps text-on-surface-variant mb-1 ml-1 uppercase">Deadline*</label>
+                  <label className="block text-[11px] font-label-caps text-on-surface-variant mb-1 ml-1 uppercase">RFQ Title*</label>
                   <input
-                    className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-primary outline-none text-on-surface"
-                    type="date"
-                    value={deadline}
-                    onChange={(e) => setDeadline(e.target.value)}
+                    className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all outline-none text-on-surface"
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
                     required
                   />
                 </div>
-              </div>
-              <div>
-                <label className="block text-[11px] font-label-caps text-on-surface-variant mb-1 ml-1 uppercase">Description</label>
-                <textarea
-                  className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-primary outline-none resize-none text-on-surface"
-                  rows={4}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-label-caps text-on-surface-variant mb-1 ml-1 uppercase">Category *</label>
+                    <select
+                      className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-primary outline-none text-on-surface"
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      required
+                    >
+                      <option value="" disabled>Select Category</option>
+                      <option value="Furniture">Furniture</option>
+                      <option value="IT Hardware">IT Hardware</option>
+                      <option value="Software">Software</option>
+                      <option value="Stationery">Stationery</option>
+                      <option value="Logistics">Logistics</option>
+                      <option value="Construction">Construction</option>
+                      <option value="Consulting">Consulting</option>
+                      <option value="Raw Materials">Raw Materials</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-label-caps text-on-surface-variant mb-1 ml-1 uppercase">Deadline*</label>
+                    <input
+                      className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-primary outline-none text-on-surface"
+                      type="date"
+                      value={deadline}
+                      onChange={(e) => setDeadline(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-label-caps text-on-surface-variant mb-1 ml-1 uppercase">Description</label>
+                  <textarea
+                    className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-primary outline-none resize-none text-on-surface"
+                    rows={4}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="flex gap-4">
-            <button
-              onClick={() => handleSave(false)}
-              className="flex-1 bg-primary text-on-primary py-3 px-6 rounded-xl font-bold flex items-center justify-center gap-2 hover:brightness-110 shadow-lg shadow-primary/20 transition-all"
-            >
-              Save &amp; Send to Vendors
-              <span className="material-symbols-outlined">send</span>
-            </button>
-            <button
-              onClick={() => handleSave(true)}
-              className="px-6 py-3 border border-outline-variant text-on-surface-variant rounded-xl font-semibold hover:bg-surface-container-high transition-colors"
-            >
-              Save as Draft
-            </button>
-          </div>
-        </div>
-
-        <div className="col-span-12 lg:col-span-7 space-y-6">
-
-          <div className="bg-surface-container rounded-xl border border-outline-variant/30 overflow-hidden relative">
-            <div className="p-6 border-b border-outline-variant/30 flex justify-between items-center">
-              <h3 className="text-title-sm font-headline-md flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">list_alt</span>
-                Line Items
-              </h3>
+            <div className="flex gap-4 justify-end">
               <button
-                onClick={handleAddLineItem}
-                className="text-primary flex items-center gap-1 text-body-sm font-semibold hover:underline"
+                type="button"
+                className="px-8 py-3.5 border border-outline-variant hover:bg-surface-container rounded-lg text-title-sm font-title-sm transition-all text-on-surface"
+                onClick={() => setActiveTab && setActiveTab('RFQs')}
               >
-                <span className="material-symbols-outlined text-lg">add</span>
-                Add line item
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="px-12 py-3.5 bg-primary hover:bg-primary/90 text-on-primary rounded-lg text-title-sm font-title-sm transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                onClick={() => {
+                  if (validateStep1()) setStep(2);
+                }}
+              >
+                Next Step
+                <span className="material-symbols-outlined !text-[20px]">arrow_forward</span>
               </button>
             </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-surface-container-high/50 border-b border-outline-variant">
-                    <th className="px-6 py-cell-padding-v text-label-caps text-on-surface-variant">ITEM DESCRIPTION</th>
-                    <th className="px-6 py-cell-padding-v text-label-caps text-on-surface-variant w-24">QTY</th>
-                    <th className="px-6 py-cell-padding-v text-label-caps text-on-surface-variant w-32">UNIT</th>
-                    <th className="px-6 py-cell-padding-v text-label-caps text-on-surface-variant w-16"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-outline-variant/10">
-                  {lineItems.map((item) => (
-                    <tr key={item.id} className="hover:bg-surface-container-highest/20 transition-colors">
-                      <td className="px-6 py-cell-padding-v font-table-data text-on-surface">{item.desc}</td>
-                      <td className="px-6 py-cell-padding-v font-table-data text-on-surface">{item.qty}</td>
-                      <td className="px-6 py-cell-padding-v font-table-data text-on-surface">{item.unit}</td>
-                      <td className="px-6 py-cell-padding-v text-right">
-                        <button
-                          onClick={() => handleDeleteItem(item.id)}
-                          className="text-on-surface-variant hover:text-error transition-colors"
-                        >
-                          <span className="material-symbols-outlined text-lg">delete</span>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {lineItems.length === 0 && (
-                    <tr>
-                      <td colSpan={4} className="text-center py-6 text-on-surface-variant opacity-60">
-                        No items added yet. Click 'Add line item' above.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
           </div>
+        )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-surface-container p-6 rounded-xl border border-outline-variant/30 relative">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-[11px] font-label-caps text-on-surface-variant uppercase tracking-widest">ASSIGN VENDORS</h3>
-                <button onClick={handleAddVendor} className="text-primary text-[11px] font-bold">+ ADD VENDOR</button>
+        {step === 2 && (
+          <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="bg-surface-container rounded-xl border border-outline-variant/30 overflow-hidden relative">
+              <div className="p-6 border-b border-outline-variant/30 flex justify-between items-center">
+                <h3 className="text-title-sm font-headline-md flex items-center gap-2 text-on-surface">
+                  <span className="material-symbols-outlined text-primary">list_alt</span>
+                  Line Items
+                </h3>
+                <button
+                  onClick={handleAddLineItem}
+                  className="text-primary flex items-center gap-1 text-body-sm font-semibold hover:underline"
+                >
+                  <span className="material-symbols-outlined text-lg">add</span>
+                  Add line item
+                </button>
               </div>
 
-              <div className="space-y-2">
-                {assignedVendors.map((vendor) => (
-                  <div key={vendor.id} className="flex items-center justify-between p-3 bg-surface-container-low rounded-lg border border-outline-variant/30 group">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs ${vendor.color}`}>
-                        {vendor.init}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-surface-container-high/50 border-b border-outline-variant">
+                      <th className="px-6 py-cell-padding-v text-label-caps text-on-surface-variant">ITEM DESCRIPTION</th>
+                      <th className="px-6 py-cell-padding-v text-label-caps text-on-surface-variant w-24">QTY</th>
+                      <th className="px-6 py-cell-padding-v text-label-caps text-on-surface-variant w-32">UNIT</th>
+                      <th className="px-6 py-cell-padding-v text-label-caps text-on-surface-variant w-16"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-outline-variant/10">
+                    {lineItems.map((item) => (
+                      <tr key={item.id} className="hover:bg-surface-container-highest/20 transition-colors">
+                        <td className="px-6 py-cell-padding-v font-table-data text-on-surface">{item.desc}</td>
+                        <td className="px-6 py-cell-padding-v font-table-data text-on-surface">{item.qty}</td>
+                        <td className="px-6 py-cell-padding-v font-table-data text-on-surface">{item.unit}</td>
+                        <td className="px-6 py-cell-padding-v text-right">
+                          <button
+                            onClick={() => handleDeleteItem(item.id)}
+                            className="text-on-surface-variant hover:text-error transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-lg">delete</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                    {lineItems.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="text-center py-6 text-on-surface-variant opacity-60">
+                          No items added yet. Click 'Add line item' above.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="flex gap-4 justify-end">
+              <button
+                type="button"
+                className="px-8 py-3.5 border border-outline-variant hover:bg-surface-container rounded-lg text-title-sm font-title-sm transition-all text-on-surface"
+                onClick={() => setStep(1)}
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                className="px-12 py-3.5 bg-primary hover:bg-primary/90 text-on-primary rounded-lg text-title-sm font-title-sm transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                onClick={() => {
+                  if (validateStep2()) setStep(3);
+                }}
+              >
+                Next Step
+                <span className="material-symbols-outlined !text-[20px]">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-surface-container p-6 rounded-xl border border-outline-variant/30 relative">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-[11px] font-label-caps text-on-surface-variant uppercase tracking-widest">ASSIGN VENDORS</h3>
+                  <button onClick={handleAddVendor} className="text-primary text-[11px] font-bold">+ ADD VENDOR</button>
+                </div>
+
+                <div className="space-y-2">
+                  {assignedVendors.map((vendor) => (
+                    <div key={vendor.id} className="flex items-center justify-between p-3 bg-surface-container-low rounded-lg border border-outline-variant/30 group">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs ${vendor.color}`}>
+                          {vendor.init}
+                        </div>
+                        <span className="text-body-sm text-on-surface">{vendor.name}</span>
                       </div>
-                      <span className="text-body-sm text-on-surface">{vendor.name}</span>
+                      <span 
+                        onClick={() => handleRemoveVendor(vendor.id)}
+                        className="material-symbols-outlined text-on-surface-variant/50 text-sm group-hover:text-error cursor-pointer transition-colors"
+                      >
+                        close
+                      </span>
                     </div>
-                    <span 
-                      onClick={() => handleRemoveVendor(vendor.id)}
-                      className="material-symbols-outlined text-on-surface-variant/50 text-sm group-hover:text-error cursor-pointer transition-colors"
-                    >
-                      close
-                    </span>
+                  ))}
+                  {assignedVendors.length === 0 && (
+                    <p className="text-xs text-on-surface-variant opacity-60 py-3 text-center">
+                      No vendors assigned. Click '+ ADD VENDOR'.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="relative bg-surface-container p-6 rounded-xl border border-dashed border-outline-variant flex flex-col items-center justify-center text-center group cursor-pointer hover:border-primary transition-colors">
+                <input 
+                  type="file" 
+                  multiple 
+                  onChange={handleFileUpload} 
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                />
+                <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary">upload_file</span>
+                </div>
+                <h4 className="text-body-sm font-semibold text-on-surface mb-1">Attachments</h4>
+                <p className="text-[11px] text-on-surface-variant">Drag &amp; drop files or click to upload</p>
+                <p className="text-[10px] text-on-surface-variant/40 mt-2 italic">PDF, DOCX, XLSX (Max 10MB)</p>
+
+                {attachments.length > 0 && (
+                  <div className="mt-4 w-full text-left space-y-1">
+                    <p className="text-[11px] font-bold text-primary">Uploaded Files:</p>
+                    {attachments.map((filename, idx) => (
+                      <p key={idx} className="text-[10px] text-on-surface truncate">📎 {filename}</p>
+                    ))}
                   </div>
-                ))}
-                {assignedVendors.length === 0 && (
-                  <p className="text-xs text-on-surface-variant opacity-60 py-3 text-center">
-                    No vendors assigned. Click '+ ADD VENDOR'.
-                  </p>
                 )}
               </div>
             </div>
 
-            <div className="relative bg-surface-container p-6 rounded-xl border border-dashed border-outline-variant flex flex-col items-center justify-center text-center group cursor-pointer hover:border-primary transition-colors">
-              <input 
-                type="file" 
-                multiple 
-                onChange={handleFileUpload} 
-                className="absolute inset-0 opacity-0 cursor-pointer"
-              />
-              <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary">upload_file</span>
-              </div>
-              <h4 className="text-body-sm font-semibold text-on-surface mb-1">Attachments</h4>
-              <p className="text-[11px] text-on-surface-variant">Drag &amp; drop files or click to upload</p>
-              <p className="text-[10px] text-on-surface-variant/40 mt-2 italic">PDF, DOCX, XLSX (Max 10MB)</p>
-
-              {attachments.length > 0 && (
-                <div className="mt-4 w-full text-left space-y-1">
-                  <p className="text-[11px] font-bold text-primary">Uploaded Files:</p>
-                  {attachments.map((filename, idx) => (
-                    <p key={idx} className="text-[10px] text-on-surface truncate">📎 {filename}</p>
-                  ))}
-                </div>
-              )}
+            <div className="flex gap-4 justify-end pt-4 border-t border-outline-variant">
+              <button
+                type="button"
+                className="px-8 py-3.5 border border-outline-variant hover:bg-surface-container rounded-lg text-title-sm font-title-sm transition-all text-on-surface"
+                onClick={() => setStep(2)}
+              >
+                Back
+              </button>
+              <button
+                onClick={() => handleSave(true)}
+                className="px-6 py-3.5 border border-outline-variant text-on-surface-variant rounded-xl font-semibold hover:bg-surface-container-high transition-colors"
+              >
+                Save as Draft
+              </button>
+              <button
+                onClick={() => handleSave(false)}
+                className="bg-primary text-on-primary py-3.5 px-8 rounded-xl font-bold flex items-center justify-center gap-2 hover:brightness-110 shadow-lg shadow-primary/20 transition-all"
+              >
+                Save &amp; Send to Vendors
+                <span className="material-symbols-outlined">send</span>
+              </button>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="fixed bottom-8 right-8 pointer-events-none opacity-20 hidden 2xl:block">
