@@ -18,7 +18,7 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
         const token = localStorage.getItem('access_token');
         const endpoint = isPO 
           ? `${API_BASE_URL}/api/procurement/purchase-orders/'
-          : `${API_BASE_URL}/api/procurement/invoices/';
+          : `${API_BASE_URL}/api/procurement/invoices/`;
         const res = await fetch(endpoint, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -49,7 +49,7 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
     if (paymentStatus === 'Paid') return;
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch(`${API_BASE_URL}/api/procurement/invoices/', {
+      const res = await fetch(`${API_BASE_URL}/api/procurement/invoices/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
       const token = localStorage.getItem('access_token');
       const endpoint = isPO 
         ? `${API_BASE_URL}/api/procurement/purchase-orders/'
-        : `${API_BASE_URL}/api/procurement/invoices/';
+        : `${API_BASE_URL}/api/procurement/invoices/`;
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -103,7 +103,7 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
   const handleGenerateInvoice = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch(`${API_BASE_URL}/api/procurement/invoices/', {
+      const res = await fetch(`${API_BASE_URL}/api/procurement/invoices/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
   };
 
   return (
-    <div className="space-y-6 relative">
+    <div className=`space-y-6 relative">
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
         <div>

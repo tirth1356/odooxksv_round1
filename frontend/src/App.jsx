@@ -72,7 +72,7 @@ export default function App() {
     setAuthError('');
     setAuthSuccess('');
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/login/', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -112,7 +112,7 @@ export default function App() {
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/register/', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/register/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -151,7 +151,7 @@ export default function App() {
   }
 
   return (
-    <div className="bg-background text-on-surface font-body-md min-h-screen overflow-x-hidden selection:bg-primary/30 relative flex flex-col justify-between">
+    <div className=`bg-background text-on-surface font-body-md min-h-screen overflow-x-hidden selection:bg-primary/30 relative flex flex-col justify-between">
 
       <div className="fixed inset-0 z-0 pointer-events-none opacity-40 overflow-hidden auth-bg">
         <div className="absolute top-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-primary/10 rounded-full blur-[120px] float-anim"></div>

@@ -23,7 +23,7 @@ export default function Dashboard({ userRole, onLogout }) {
     const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const res = await fetch(`${API_BASE_URL}/api/dashboard/', {
+        const res = await fetch(`${API_BASE_URL}/api/dashboard/`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -68,7 +68,7 @@ export default function Dashboard({ userRole, onLogout }) {
 
   return (
     <div 
-      className="min-h-screen bg-background text-on-surface font-body-md relative overflow-hidden flex"
+      className=`min-h-screen bg-background text-on-surface font-body-md relative overflow-hidden flex"
       onMouseMove={handleMouseMove}
       style={glowStyle}
     >

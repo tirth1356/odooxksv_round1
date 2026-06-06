@@ -12,7 +12,7 @@ export default function QuotationComparison({ onBack }) {
     const fetchComparisonData = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const res = await fetch(`${API_BASE_URL}/api/rfqs/compare/', {
+        const res = await fetch(`${API_BASE_URL}/api/rfqs/compare/`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -46,7 +46,7 @@ export default function QuotationComparison({ onBack }) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className=`space-y-6">
 
       <div className="max-w-container-max mx-auto">
         <nav className="flex items-center gap-2 text-on-surface-variant text-label-caps font-label-caps mb-4">

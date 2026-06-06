@@ -12,7 +12,7 @@ export default function Approvals({ setActiveTab }) {
     const fetchApprovalData = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const res = await fetch(`${API_BASE_URL}/api/approvals/', {
+        const res = await fetch(`${API_BASE_URL}/api/approvals/`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -33,7 +33,7 @@ export default function Approvals({ setActiveTab }) {
   const handleApprove = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch(`${API_BASE_URL}/api/approvals/', {
+      const res = await fetch(`${API_BASE_URL}/api/approvals/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export default function Approvals({ setActiveTab }) {
   const handleReject = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch(`${API_BASE_URL}/api/approvals/', {
+      const res = await fetch(`${API_BASE_URL}/api/approvals/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export default function Approvals({ setActiveTab }) {
         setStatus(responseData.data.status);
         setRemarks(responseData.data.remarks || '');
         setApprovalChain(responseData.data.approval_chain || []);
-        showToast('Quotation has been rejected with comments: "' + remarks + '"');
+        showToast('Quotation has been rejected with comments: `' + remarks + '"');
       } else {
         showAlert('Error rejecting quotation.');
       }

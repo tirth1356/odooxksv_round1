@@ -14,7 +14,7 @@ export default function Activity({ setActiveTab }) {
     const fetchLogs = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const res = await fetch(`${API_BASE_URL}/api/procurement/activity-logs/', {
+        const res = await fetch(`${API_BASE_URL}/api/procurement/activity-logs/`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -63,7 +63,7 @@ export default function Activity({ setActiveTab }) {
     
     logs.forEach(log => {
       const row = [
-        `"${log.title.replace(/"/g, '""')}"`,
+        ``${log.title.replace(/"/g, '""')}"`,
         `"${log.desc.replace(/"/g, '""')}"`,
         `"${log.category.replace(/"/g, '""')}"`,
         `"${log.time.replace(/"/g, '""')}"`
