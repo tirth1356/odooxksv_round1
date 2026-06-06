@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDialog } from '../context/DialogContext';
 import html2pdf from 'html2pdf.js';
+import { API_BASE_URL } from '../config';
 
 export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' }) {
   const { showAlert } = useDialog();
@@ -16,8 +17,8 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
       try {
         const token = localStorage.getItem('access_token');
         const endpoint = isPO 
-          ? 'http://localhost:8000/api/procurement/purchase-orders/'
-          : 'http://localhost:8000/api/procurement/invoices/';
+          ? `${API_BASE_URL}/api/procurement/purchase-orders/'
+          : `${API_BASE_URL}/api/procurement/invoices/';
         const res = await fetch(endpoint, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -48,7 +49,7 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
     if (paymentStatus === 'Paid') return;
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch('http://localhost:8000/api/procurement/invoices/', {
+      const res = await fetch(`${API_BASE_URL}/api/procurement/invoices/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,8 +76,8 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
     try {
       const token = localStorage.getItem('access_token');
       const endpoint = isPO 
-        ? 'http://localhost:8000/api/procurement/purchase-orders/'
-        : 'http://localhost:8000/api/procurement/invoices/';
+        ? `${API_BASE_URL}/api/procurement/purchase-orders/'
+        : `${API_BASE_URL}/api/procurement/invoices/';
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -102,7 +103,7 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
   const handleGenerateInvoice = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch('http://localhost:8000/api/procurement/invoices/', {
+      const res = await fetch(`${API_BASE_URL}/api/procurement/invoices/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDialog } from '../context/DialogContext';
+import { API_BASE_URL } from '../config';
 
 export default function Approvals({ setActiveTab }) {
   const { showAlert, showToast } = useDialog();
@@ -11,7 +12,7 @@ export default function Approvals({ setActiveTab }) {
     const fetchApprovalData = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const res = await fetch('http://localhost:8000/api/approvals/', {
+        const res = await fetch(`${API_BASE_URL}/api/approvals/', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -32,7 +33,7 @@ export default function Approvals({ setActiveTab }) {
   const handleApprove = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch('http://localhost:8000/api/approvals/', {
+      const res = await fetch(`${API_BASE_URL}/api/approvals/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,7 +58,7 @@ export default function Approvals({ setActiveTab }) {
   const handleReject = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch('http://localhost:8000/api/approvals/', {
+      const res = await fetch(`${API_BASE_URL}/api/approvals/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

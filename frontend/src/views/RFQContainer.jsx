@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDialog } from '../context/DialogContext';
+import { API_BASE_URL } from '../config';
 
 export default function RFQContainer({ setActiveTab }) {
   const { showAlert, showPrompt, showToast } = useDialog();
@@ -91,7 +92,7 @@ export default function RFQContainer({ setActiveTab }) {
 
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch('http://localhost:8000/api/rfqs/', {
+      const res = await fetch(`${API_BASE_URL}/api/rfqs/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

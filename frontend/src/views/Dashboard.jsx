@@ -8,6 +8,7 @@ import DocumentViewer from './DocumentViewer';
 import Activity from './Activity';
 import Reports from './Reports';
 import { useDialog } from '../context/DialogContext';
+import { API_BASE_URL } from '../config';
 
 export default function Dashboard({ userRole, onLogout }) {
   const { showAlert } = useDialog();
@@ -22,7 +23,7 @@ export default function Dashboard({ userRole, onLogout }) {
     const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const res = await fetch('http://localhost:8000/api/dashboard/', {
+        const res = await fetch(`${API_BASE_URL}/api/dashboard/', {
           headers: {
             'Authorization': `Bearer ${token}`
           }

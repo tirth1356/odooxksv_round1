@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDialog } from '../context/DialogContext';
+import { API_BASE_URL } from '../config';
 
 export default function Activity({ setActiveTab }) {
   const { showAlert } = useDialog();
@@ -13,7 +14,7 @@ export default function Activity({ setActiveTab }) {
     const fetchLogs = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        const res = await fetch('http://localhost:8000/api/procurement/activity-logs/', {
+        const res = await fetch(`${API_BASE_URL}/api/procurement/activity-logs/', {
           headers: {
             'Authorization': `Bearer ${token}`
           }

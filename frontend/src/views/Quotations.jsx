@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDialog } from '../context/DialogContext';
+import { API_BASE_URL } from '../config';
 
 export default function Quotations({ onBackToRFQs, onCompare }) {
   const { showAlert, showPrompt, showToast } = useDialog();
@@ -86,7 +87,7 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
 
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch('http://localhost:8000/api/procurement/quotations/', {
+      const res = await fetch(`${API_BASE_URL}/api/procurement/quotations/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
