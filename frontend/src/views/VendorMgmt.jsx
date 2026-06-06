@@ -3,12 +3,7 @@ import React, { useState, useEffect } from 'react';
 export default function VendorMgmt() {
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
-  const [vendors, setVendors] = useState([
-    { id: 1, init: 'IS', name: 'Infra Supplies Pvt Ltd', category: 'Constructions', gst: '27AABCS1429Bz0', contact: '+91 98230 45XXX', status: 'Active' },
-    { id: 2, init: 'TC', name: 'Tech Core LTD', category: 'IT & Electronics', gst: '27AABCS1429Bz0', contact: '+91 97412 88XXX', status: 'Active' },
-    { id: 3, init: 'FL', name: 'FastLog Transport', category: 'Logistics', gst: '27AABCS1429Bz0', contact: '+91 88562 11XXX', status: 'Blocked' },
-    { id: 4, init: 'MS', name: 'Modular Solutions', category: 'Furniture', gst: '27AABCS1429Bz0', contact: '+91 74125 66XXX', status: 'Pending' },
-  ]);
+  const [vendors, setVendors] = useState([]);
 
   useEffect(() => {
     const fetchVendors = async () => {

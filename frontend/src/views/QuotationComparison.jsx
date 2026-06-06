@@ -12,54 +12,7 @@ export default function QuotationComparison({ onBack }) {
     { label: 'Compliance', icon: 'settings_suggest', key: 'compliance' }
   ];
 
-  const vendors = [
-    {
-      id: '#INF-882',
-      name: 'Infra Supplies',
-      total: '$185,000.00',
-      gst: '18%',
-      delivery: { text: '10 Days', tag: 'Fast', tagStyle: 'bg-tertiary-container/20 text-tertiary' },
-      rating: '4.5/5',
-      terms: '30 days',
-      compliance: true,
-      badge: 'Lowest Price',
-      logo: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDwD8CFRfZ04oH-3CTRcen_6WT6yy1d7pztIIzmG70QvNcIt-_Mu_5rxIW25ZMsumWWQKpqRqdx9jtnQwHRcuqjdikpCl4xFRSARPGFGxI-hPaL_2-v4fhpIHMtRo3cOBnbt9r5w5jeVB14FKAeZixggjqyU-54IFEzXZ22DfG1xSOoY0HKrmqzYBhIE5QqV1tPpNGFFq2jzj04BAG_IakS-JIM01FcRVT0-GqAFiABIy6k_IM0JeOCYjqqFXQBj-8q9s5tS8aWonhO',
-      location: 'San Francisco, CA',
-      reliability: '98.2%',
-      prevPOs: 124,
-      desc: 'Long-standing partner with consistent delivery track record for office infrastructure components.'
-    },
-    {
-      id: '#TC-441',
-      name: 'TechCore LTD',
-      total: '$200,010.00',
-      gst: '18%',
-      delivery: { text: '14 Days' },
-      rating: '4.2/5',
-      terms: '30 days',
-      compliance: true,
-      logo: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD3HuPh7MIix3F9E2TELyypW2vkhZeZSeCIw31k_uxJf_36tA4wFl0ASDLNyNyAAAuBFMqgTyPItjFGYo1nbglci0Enj3kGTayumVeNx7quTLhHF0kFEZ99oLcIqOGgR1o2zggrOsHUqrAd_Pzvlqg9C1NUzK4WC44ih7Nzoxic-bnJ9mSMqCaKwam9Ax3lZ2HcFDOjlf69e5yj8umC0YTsw475rVKht50e4JqTiOOHUO4fUSXD3WU47ff54mihUzBwa8a8q1LUD4OD',
-      location: 'Austin, TX',
-      reliability: '94.0%',
-      prevPOs: 42,
-      desc: 'High-tech furniture specialists. Premium pricing with moderate delivery speed.'
-    },
-    {
-      id: '#ONC-109',
-      name: 'Office Need Co.',
-      total: '$214,800.00',
-      gst: '18%',
-      delivery: { text: '7 Days', tag: 'Fastest', tagStyle: 'bg-primary-container text-on-primary-container' },
-      rating: '3.8/5',
-      terms: '15 days',
-      compliance: false,
-      logo: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAFdiGXtUwR7ETw7ttl2m9iGFZP54sp-xuhyZ1RZE99kdZJ62cVU0BLCwjv0kmdzmiVyr-8X0e-19nZgyvbZOaRQZgUvR2JT1Uqk9N2JA7f6-AEhnMFlym5cypEyGXw7bhXa5Jcy8Bw0NBAPD3CMgm-uIsq-G5rKFOx3v78WoWwyFE01mwopRCJ-5_oC701ZyH7ykNQCTFghAhSHCly9NUzh7noC-PyHkOyTrEb9nulrsCuCu8bn5ILuMFErabIqKlYW05bH3ZQJ1m7',
-      location: 'New York, NY',
-      reliability: '89.5%',
-      prevPOs: 18,
-      desc: 'Economic supplier. Frequent technical non-compliances in past two RFQs.'
-    }
-  ];
+  const vendors = [];
 
   const handleApprove = (vendorName) => {
     setSelectedVendor(vendorName);
@@ -106,6 +59,12 @@ export default function QuotationComparison({ onBack }) {
       </div>
 
       {/* Comparison Table (Bento Grid Inspired Layout) */}
+      {vendors.length === 0 ? (
+        <div className="max-w-container-max mx-auto p-12 text-center bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl text-on-surface-variant">
+          No quotations available for comparison yet.
+        </div>
+      ) : (
+      <>
       <div className="max-w-container-max mx-auto">
         <div className="grid grid-cols-4 gap-0 border border-outline-variant rounded-xl overflow-hidden bg-surface-container-low shadow-2xl">
           {/* Row 1: Header / Labels */}
@@ -356,6 +315,8 @@ export default function QuotationComparison({ onBack }) {
           );
         })}
       </div>
+      </>
+      )}
     </div>
   );
 }

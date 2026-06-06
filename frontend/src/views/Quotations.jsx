@@ -5,10 +5,7 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
   const [validity, setValidity] = useState('30 Days');
   const [paymentTerms, setPaymentTerms] = useState('Payment terms: 20 days net. Standard 1-year warranty included for all furniture items. Shipping included in the quoted price.');
 
-  const [lineItems, setLineItems] = useState([
-    { id: 1, desc: 'Ergonomic Office Chair - Mesh Back', icon: 'chair', qty: 25, unitPrice: 3500, deliveryDays: 7 },
-    { id: 2, desc: 'Tech Core Adjustable Standing Desk', icon: 'desk', qty: 10, unitPrice: 8200, deliveryDays: 14 }
-  ]);
+  const [lineItems, setLineItems] = useState([]);
 
   const handleUnitPriceChange = (id, newPrice) => {
     setLineItems(lineItems.map(item => {

@@ -2,20 +2,13 @@ import React, { useState } from 'react';
 
 export default function RFQContainer() {
   const [step, setStep] = useState(1);
-  const [title, setTitle] = useState('Office Furniture procurement Q2');
-  const [category, setCategory] = useState('Furniture');
-  const [deadline, setDeadline] = useState('2025-06-15');
-  const [description, setDescription] = useState('Ergonomic chairs and standing desks for 3rd floor workspace expansion. High durability grade required.');
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('');
+  const [deadline, setDeadline] = useState('');
+  const [description, setDescription] = useState('');
 
-  const [lineItems, setLineItems] = useState([
-    { id: 1, desc: 'Ergonomic task chair - Mesh back', qty: 25, unit: 'NOS' },
-    { id: 2, desc: 'Motorized Standing Desks (140x80cm)', qty: 10, unit: 'NOS' },
-  ]);
-
-  const [assignedVendors, setAssignedVendors] = useState([
-    { id: 1, init: 'IS', name: 'Infra Supplies Pvt Ltd', color: 'bg-emerald-500/10 text-primary' },
-    { id: 2, init: 'TL', name: 'Techcore LTD', color: 'bg-blue-500/10 text-blue-400' },
-  ]);
+  const [lineItems, setLineItems] = useState([]);
+  const [assignedVendors, setAssignedVendors] = useState([]);
 
   const [attachments, setAttachments] = useState([]);
 
@@ -107,7 +100,7 @@ export default function RFQContainer() {
         <div className="absolute top-1/2 left-0 w-full h-[2px] bg-surface-container-highest -translate-y-1/2 z-0"></div>
         <div 
           className="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-300"
-          style={{ width: step === 1 ? '33.33%' : step === 2 ? '66.66%' : '100%' }}
+          style={{ width: step === 1 ? '0%' : step === 2 ? '50%' : '100%' }}
         />
         
         <button 
@@ -211,12 +204,6 @@ export default function RFQContainer() {
         <div className="col-span-12 lg:col-span-7 space-y-6">
           {/* Line Items Table */}
           <div className="bg-surface-container rounded-xl border border-outline-variant/30 overflow-hidden relative">
-            {/* Superb Hummingbird Tooltip */}
-            <div className="absolute right-40 top-4 z-10 flex items-center gap-1.5 bg-primary text-on-primary text-[10px] font-bold px-2 py-1 rounded shadow-lg animate-bounce pointer-events-none">
-              <span className="material-symbols-outlined text-[12px]">navigation</span>
-              Superb Hummingbird
-            </div>
-            
             <div className="p-6 border-b border-outline-variant/30 flex justify-between items-center">
               <h3 className="text-title-sm font-headline-md flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">list_alt</span>
@@ -272,12 +259,6 @@ export default function RFQContainer() {
           {/* Assign Vendors & Dropzone */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-surface-container p-6 rounded-xl border border-outline-variant/30 relative">
-              {/* Artistic Goat Tooltip */}
-              <div className="absolute right-4 top-2 z-10 flex items-center gap-1.5 bg-primary text-on-primary text-[10px] font-bold px-2 py-1 rounded shadow-lg animate-pulse pointer-events-none">
-                <span className="material-symbols-outlined text-[12px]">navigation</span>
-                Artistic Goat
-              </div>
-
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-[11px] font-label-caps text-on-surface-variant uppercase tracking-widest">ASSIGN VENDORS</h3>
                 <button onClick={handleAddVendor} className="text-primary text-[11px] font-bold">+ ADD VENDOR</button>

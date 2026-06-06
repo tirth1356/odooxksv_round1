@@ -5,12 +5,7 @@ export default function DocumentViewer() {
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   
-  const [timeline, setTimeline] = useState([
-    { id: 1, title: 'PO Generated', time: 'Today, 4:15 PM', completed: true },
-    { id: 2, title: 'Approved by Priya Shah', time: 'Today, 2:30 PM', completed: true },
-    { id: 3, title: 'Approved by Rahul Mehta', time: 'Today, 10:45 AM', completed: true },
-    { id: 4, title: 'Awaiting Payment Confirmation', time: 'Estimate: June 21, 2025', completed: false }
-  ]);
+  const [timeline, setTimeline] = useState([]);
 
   const triggerToast = (message) => {
     setToastMessage(message);
@@ -168,23 +163,10 @@ export default function DocumentViewer() {
                   </tr>
                 </thead>
                 <tbody className="text-on-surface font-table-data text-body-md">
-                  <tr className="border-b border-outline-variant/50 hover:bg-surface-container-high transition-colors">
-                    <td className="py-cell-padding-v px-cell-padding-h">
-                      <p className="font-bold">Ergonomic Office Chair - Model Elite</p>
-                      <p className="text-xs text-on-surface-variant">Black mesh, adjustable lumbar support</p>
+                  <tr>
+                    <td colSpan={4} className="py-8 px-4 text-center text-on-surface-variant opacity-60">
+                      No invoice items found.
                     </td>
-                    <td className="py-cell-padding-v px-cell-padding-h text-right font-mono">25</td>
-                    <td className="py-cell-padding-v px-cell-padding-h text-right font-mono">₹ 3,500</td>
-                    <td className="py-cell-padding-v px-cell-padding-h text-right font-mono">₹ 87,500</td>
-                  </tr>
-                  <tr className="border-b border-outline-variant/50 hover:bg-surface-container-high transition-colors">
-                    <td className="py-cell-padding-v px-cell-padding-h">
-                      <p className="font-bold">Standing Desk - Motorized</p>
-                      <p className="text-xs text-on-surface-variant">Dual motor, 4 memory presets</p>
-                    </td>
-                    <td className="py-cell-padding-v px-cell-padding-h text-right font-mono">10</td>
-                    <td className="py-cell-padding-v px-cell-padding-h text-right font-mono">₹ 8,200</td>
-                    <td className="py-cell-padding-v px-cell-padding-h text-right font-mono">₹ 82,000</td>
                   </tr>
                 </tbody>
               </table>
@@ -283,6 +265,9 @@ export default function DocumentViewer() {
           <div className="glass-panel rounded-xl p-6">
             <h3 className="font-label-caps text-label-caps text-on-surface-variant mb-6 uppercase">PO Timeline</h3>
             <div className="relative space-y-6 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-px before:bg-outline-variant">
+              {timeline.length === 0 && (
+                <p className="text-sm text-on-surface-variant opacity-60">No timeline events available.</p>
+              )}
               {timeline.map((event) => (
                 <div key={event.id} className="relative pl-10">
                   <div className={`absolute left-0 top-1 w-6 h-6 rounded-full flex items-center justify-center ${

@@ -3,11 +3,7 @@ import React, { useState } from 'react';
 export default function Approvals() {
   const [status, setStatus] = useState('L2 Pending'); // 'L2 Pending', 'Approved', 'Rejected'
   const [remarks, setRemarks] = useState('');
-  const [approvalChain, setApprovalChain] = useState([
-    { id: 1, name: 'Rahul Mehta', role: 'Procurement Head', status: 'Approved', info: 'Approved on May 20, 10:32 Am' },
-    { id: 2, name: 'Priya Shah', role: 'Finance Manager', status: 'Awaiting', info: 'Assigned May 21' },
-    { id: 3, name: 'David Chen', role: 'CFO (Final Review)', status: 'Future', info: '' }
-  ]);
+  const [approvalChain, setApprovalChain] = useState([]);
 
   const handleApprove = () => {
     setStatus('Approved');
@@ -127,6 +123,9 @@ export default function Approvals() {
                 {/* Connector Line */}
                 <div className="absolute left-[19px] top-4 bottom-4 w-[1px] bg-outline-variant/30"></div>
                 
+                {approvalChain.length === 0 && (
+                  <p className="text-on-surface-variant text-sm opacity-60">No approval chain configured.</p>
+                )}
                 {approvalChain.map((person, idx) => {
                   let badgeIcon = 'person';
                   let iconStyle = 'bg-surface-container-highest border border-outline-variant text-on-surface-variant';

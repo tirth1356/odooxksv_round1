@@ -22,10 +22,12 @@ function App() {
   const [regTerms, setRegTerms] = useState(false);
   const [regPassword, setRegPassword] = useState('');
   const [authError, setAuthError] = useState('');
+  const [authSuccess, setAuthSuccess] = useState('');
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setAuthError('');
+    setAuthSuccess('');
     try {
       const res = await fetch('http://localhost:8000/api/auth/login/', {
         method: 'POST',
@@ -57,6 +59,7 @@ function App() {
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setAuthError('');
+    setAuthSuccess('');
     if (!regTerms) {
       alert('You must agree to the Terms of Service and Data Privacy Policy.');
       return;
@@ -80,7 +83,7 @@ function App() {
       });
       const data = await res.json();
       if (res.ok) {
-        alert('Partner registration submitted successfully!');
+        setAuthSuccess('Partner registration submitted successfully! You may now log in.');
         setScreen('login');
       } else {
         setAuthError(JSON.stringify(data));
@@ -161,7 +164,8 @@ function App() {
                   Authorize Entry
                   <span className="material-symbols-outlined !text-[20px]">arrow_forward</span>
                 </button>
-                {authError && <p className="text-error text-center mt-2">{authError}</p>}
+                {authError && <div className="bg-error/10 border border-error/20 text-error p-3 rounded-lg text-center mt-4 font-body-sm">{authError}</div>}
+                {authSuccess && <div className="bg-primary/10 border border-primary/20 text-primary p-3 rounded-lg text-center mt-4 font-body-sm">{authSuccess}</div>}
               </form>
 
               <div className="mt-8 pt-6 border-t border-outline-variant flex flex-col items-center gap-4">
@@ -381,7 +385,7 @@ function App() {
                     </button>
                   </div>
                 </div>
-                {authError && <p className="text-error text-center mt-4">{authError}</p>}
+                {authError && <div className="bg-error/10 border border-error/20 text-error p-3 rounded-lg text-center mt-6 font-body-sm w-full">{authError}</div>}
               </form>
             </div>
           </section>

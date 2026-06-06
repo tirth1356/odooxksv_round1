@@ -5,33 +5,14 @@ export default function Reports() {
   const [tickerIndex, setTickerIndex] = useState(0);
   const [selectedRange, setSelectedRange] = useState('May 1, 2025 - May 31, 2025');
 
-  const categories = [
-    { name: 'IT Hardware', spend: 4.8, percentage: 78, color: 'bg-primary' },
-    { name: 'Furniture', spend: 3.2, percentage: 52, color: 'bg-primary/70' },
-    { name: 'Stationery', spend: 2.1, percentage: 34, color: 'bg-primary/40' },
-    { name: 'Logistics', spend: 2.3, percentage: 38, color: 'bg-primary/50' }
-  ];
+  const categories = [];
 
-  const topVendors = [
-    { init: 'TC', name: 'TechCore Ltd', pos: 6, spend: '$4.2M', rating: '4.8 Rating' },
-    { init: 'IS', name: 'Infra Supplies', pos: 4, spend: '$3.1M', rating: '4.2 Rating' },
-    { init: 'FL', name: 'FastLog', pos: 3, spend: '$1.9M', rating: '3.9 Rating' },
-    { init: 'SV', name: 'Star Vendors', pos: 2, spend: '$0.9M', rating: '4.5 Rating' }
-  ];
+  const topVendors = [];
 
-  const monthlyTrend = [
-    { month: 'Jan', height: 'h-20', spend: '$5.4M' },
-    { month: 'Feb', height: 'h-28', spend: '$7.8M' },
-    { month: 'Mar', height: 'h-32', spend: '$9.2M' },
-    { month: 'Apr', height: 'h-36', spend: '$10.5M' },
-    { month: 'May', height: 'h-44', spend: '$12.4M', active: true }
-  ];
+  const monthlyTrend = [];
 
   const tickers = [
-    "LIVE: Purchase Order PO-2025-0068 approved by Priya Shah",
-    "LIVE: New Quotation submitted by TechCore Ltd for IT Support RFQ",
-    "LIVE: Onboarding process completed for Star Vendors",
-    "LIVE: Invoice #INV-990 marked as Paid by Alex Thompson"
+    "No recent activity to display."
   ];
 
   useEffect(() => {
@@ -148,6 +129,9 @@ export default function Reports() {
           </div>
           
           <div className="flex-1 flex flex-col justify-around gap-6">
+            {categories.length === 0 && (
+              <p className="text-sm text-on-surface-variant opacity-60">No spending data available.</p>
+            )}
             {categories.map((c) => (
               <div key={c.name} className="space-y-2 group cursor-pointer">
                 <div className="flex justify-between text-body-sm">
@@ -186,6 +170,9 @@ export default function Reports() {
           <div>
             <h4 className="font-title-sm text-title-sm text-on-surface mb-6">Top Vendors by Spend</h4>
             <div className="space-y-4">
+              {topVendors.length === 0 && (
+                <p className="text-sm text-on-surface-variant opacity-60">No vendor data available.</p>
+              )}
               {topVendors.map((v) => (
                 <div key={v.name} className="flex items-center justify-between p-3 rounded hover:bg-surface-container-highest/30 transition-colors border-b border-outline-variant/10 group cursor-pointer">
                   <div className="flex items-center gap-3">
@@ -228,6 +215,11 @@ export default function Reports() {
           )}
 
           <div className="h-48 flex items-end justify-between gap-4 px-2">
+            {monthlyTrend.length === 0 && (
+              <div className="w-full h-full flex items-center justify-center">
+                <p className="text-sm text-on-surface-variant opacity-60">No trend data available.</p>
+              </div>
+            )}
             {monthlyTrend.map((m) => (
               <div 
                 key={m.month} 

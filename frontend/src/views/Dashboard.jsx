@@ -248,80 +248,9 @@ export default function Dashboard({ userRole, onLogout }) {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-outline-variant/30">
-                        <tr className="hover:bg-surface-container-high transition-colors group">
-                          <td className="px-6 py-cell-padding-v font-table-data text-table-data text-on-surface">PO-2024-001</td>
-                          <td className="px-6 py-cell-padding-v font-table-data text-table-data text-on-surface">
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 bg-primary-fixed text-on-primary-fixed rounded flex items-center justify-center text-[10px] font-bold">IN</div>
-                              <span>Infra Logistics</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-cell-padding-v font-table-data text-table-data text-on-surface">$ 87,000</td>
-                          <td className="px-6 py-cell-padding-v">
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-primary-container/10 text-primary">
-                              <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
-                              Approved
-                            </span>
-                          </td>
-                          <td className="px-6 py-cell-padding-v">
-                            <button onClick={() => alert('PO Options')} className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
-                          </td>
-                        </tr>
-                        <tr className="hover:bg-surface-container-high transition-colors group">
-                          <td className="px-6 py-cell-padding-v font-table-data text-table-data text-on-surface">PO-2024-002</td>
-                          <td className="px-6 py-cell-padding-v font-table-data text-table-data text-on-surface">
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 bg-secondary-fixed text-on-secondary-fixed rounded flex items-center justify-center text-[10px] font-bold">TC</div>
-                              <span>Tech Core Hub</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-cell-padding-v font-table-data text-table-data text-on-surface">$ 140,000</td>
-                          <td className="px-6 py-cell-padding-v">
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-tertiary-container/10 text-tertiary">
-                              <span className="w-1.5 h-1.5 bg-tertiary rounded-full"></span>
-                              Pending
-                            </span>
-                          </td>
-                          <td className="px-6 py-cell-padding-v">
-                            <button onClick={() => alert('PO Options')} className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
-                          </td>
-                        </tr>
-                        <tr className="hover:bg-surface-container-high transition-colors group">
-                          <td className="px-6 py-cell-padding-v font-table-data text-table-data text-on-surface">PO-2024-003</td>
-                          <td className="px-6 py-cell-padding-v font-table-data text-table-data text-on-surface">
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 bg-outline-variant text-on-surface-variant rounded flex items-center justify-center text-[10px] font-bold">ON</div>
-                              <span>OfficeNeed Co</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-cell-padding-v font-table-data text-table-data text-on-surface">$ 34,900</td>
-                          <td className="px-6 py-cell-padding-v">
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-surface-container-highest/30 text-on-surface-variant">
-                              <span className="w-1.5 h-1.5 bg-outline rounded-full"></span>
-                              Draft
-                            </span>
-                          </td>
-                          <td className="px-6 py-cell-padding-v">
-                            <button onClick={() => alert('PO Options')} className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
-                          </td>
-                        </tr>
-                        <tr className="hover:bg-surface-container-high transition-colors group">
-                          <td className="px-6 py-cell-padding-v font-table-data text-table-data text-on-surface">PO-2024-004</td>
-                          <td className="px-6 py-cell-padding-v font-table-data text-table-data text-on-surface">
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 bg-primary-fixed text-on-primary-fixed rounded flex items-center justify-center text-[10px] font-bold">GS</div>
-                              <span>Global Steel</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-cell-padding-v font-table-data text-table-data text-on-surface">$ 212,500</td>
-                          <td className="px-6 py-cell-padding-v">
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-primary-container/10 text-primary">
-                              <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
-                              Approved
-                            </span>
-                          </td>
-                          <td className="px-6 py-cell-padding-v">
-                            <button onClick={() => alert('PO Options')} className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
+                        <tr>
+                          <td colSpan={5} className="px-6 py-8 text-center text-on-surface-variant opacity-60">
+                            No recent purchase orders found.
                           </td>
                         </tr>
                       </tbody>
@@ -428,10 +357,7 @@ export default function Dashboard({ userRole, onLogout }) {
             </div>
           )}
 
-          {/* DECORATIVE BACKGROUND ELEMENTS */}
-          <div className="fixed bottom-0 right-0 p-12 -z-10 pointer-events-none opacity-20">
-            <div className="text-[120px] font-bold text-primary select-none opacity-5">Big Squid</div>
-          </div>
+
         </main>
       </div>
     </div>

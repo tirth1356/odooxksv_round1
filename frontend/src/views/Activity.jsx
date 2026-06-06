@@ -2,46 +2,10 @@ import React, { useState, useEffect } from 'react';
 
 export default function Activity() {
   const [filter, setFilter] = useState('All');
-  const [alerts, setAlerts] = useState([
-    { id: 1, title: 'RFQ Deadline Approaching', desc: 'Office Supplies Q2 expires in 4 hours.', type: 'error' },
-    { id: 2, title: 'Payment Processed', desc: 'Invoice #INV-990 paid successfully.', type: 'primary' },
-    { id: 3, title: 'Quotation Received', desc: '3 new quotes for IT Support RFP.', type: 'tertiary' }
-  ]);
+  const [alerts, setAlerts] = useState([]);
   const [toast, setToast] = useState(null);
 
-  const initialLogs = [
-    {
-      id: 1,
-      title: 'Quotation Final Approval',
-      desc: 'PO-2024-0068 approved by Priya Shah (Finance)',
-      category: 'Approvals',
-      time: '4:12 PM',
-      doc: { name: 'Purchase_Order_2024_068.pdf', type: 'Purchase Order' }
-    },
-    {
-      id: 2,
-      title: 'New Vendor Onboarded',
-      desc: 'TechCore Ltd has successfully completed the registration process.',
-      category: 'Vendors',
-      time: '2:45 PM',
-      tags: ['Category: IT Hardware', 'Status: KYC Verified']
-    },
-    {
-      id: 3,
-      title: 'RFQ Revision',
-      desc: 'RFQ-2024-Q2-Office furniture updated by Rahul Mehta.',
-      category: 'RFQs',
-      time: '10:30 AM',
-      note: 'Updated line items to include 5 additional ergonomic chairs as per latest headcount.'
-    },
-    {
-      id: 4,
-      title: 'Invoice Uploaded',
-      desc: 'Vendor FastLog Logistics uploaded Invoice #INV-8892.',
-      category: 'Invoices',
-      time: 'Yesterday, 11:15 PM'
-    }
-  ];
+  const initialLogs = [];
 
   const [logs, setLogs] = useState(initialLogs);
 
