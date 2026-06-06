@@ -25,7 +25,7 @@ from apps.procurement.views import (
     QuotationSubmitView,
 )
 from apps.vendors.views import MockVendorListView
-from apps.rfqs.views import MockRFQView, MockQuotationComparisonView
+from apps.rfqs.views import MockRFQView, MockQuotationComparisonView, RFQAcceptView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,6 +34,7 @@ urlpatterns = [
     path('api/vendors/', MockVendorListView.as_view(), name='mock_vendors'),
     path('api/rfqs/', MockRFQView.as_view(), name='mock_rfqs'),
     path('api/rfqs/compare/', MockQuotationComparisonView.as_view(), name='mock_rfq_compare'),
+    path('api/rfqs/<int:rfq_id>/accept/', RFQAcceptView.as_view(), name='rfq_accept'),
     path('api/approvals/', MockApprovalsView.as_view(), name='mock_approvals'),
     path('api/procurement/purchase-orders/', MockPOView.as_view(), name='mock_purchase_orders'),
     path('api/procurement/invoices/', MockInvoiceView.as_view(), name='mock_invoices'),

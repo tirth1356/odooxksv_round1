@@ -24,6 +24,7 @@ class QuotationSerializer(serializers.ModelSerializer):
 class RFQSerializer(serializers.ModelSerializer):
     line_items = RFQLineItemSerializer(many=True)
     assigned_vendors = serializers.SerializerMethodField()
+    accepted_vendors = serializers.SerializerMethodField()
     quotations = QuotationSerializer(many=True, read_only=True)
 
     class Meta:
@@ -31,12 +32,15 @@ class RFQSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'category', 'deadline', 'description',
             'status', 'created_by', 'created_at', 'line_items',
-            'assigned_vendors', 'quotations',
+            'assigned_vendors', 'accepted_vendors', 'quotations',
         ]
         read_only_fields = ['id', 'created_at']
 
     def get_assigned_vendors(self, obj):
         return [v.vendor_name for v in obj.assigned_vendors.all()]
+
+    def get_accepted_vendors(self, obj):
+        return [v.vendor_name for v in obj.accepted_vendors.all()]
 
     def create(self, validated_data):
         line_items_data = validated_data.pop('line_items', [])

@@ -33,8 +33,8 @@ class MockAPITests(APITestCase):
         # Test search query
         response = self.client.get(url, {'search': 'IT'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data[0]['vendor_name'], 'Techcore LTD')
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['vendor_name'], 'Global Tech Solutions')
 
     def test_mock_rfqs_lifecycle(self):
         url = reverse('mock_rfqs')
@@ -43,18 +43,18 @@ class MockAPITests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['title'], 'Office Furniture procurement Q2')
+        self.assertEqual(response.data[0]['title'], 'Enterprise Data Center Servers Procurement')
 
         # Test creating new mock RFQ
         data = {
             "title": "IT hardware upgrade Q3",
-            "category": "IT",
+            "category": "IT Infrastructure",
             "deadline": "2026-09-30",
             "description": "Laptops and monitors",
             "line_items": [
                 {"item": "Laptop", "qty": 15, "unit": "NOS"}
             ],
-            "assigned_vendors": ["Techcore LTD"]
+            "assigned_vendors": ["Global Tech Solutions"]
         }
         
         post_response = self.client.post(url, data, format='json')
@@ -73,7 +73,7 @@ class MockAPITests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 3)
-        self.assertEqual(response.data[0]['name'], 'Infra Supplies Pvt Ltd')
+        self.assertEqual(response.data[0]['name'], 'Acme Corporation')
         self.assertEqual(response.data[0]['badge'], 'Lowest Price')
 
     def test_mock_approvals(self):
@@ -83,7 +83,7 @@ class MockAPITests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], 'L2 Pending')
-        self.assertEqual(response.data['rfq_title'], 'Office Furniture procurement Q2')
+        self.assertEqual(response.data['rfq_title'], 'Enterprise Data Center Servers Procurement')
         
         # Test POST approve
         response = self.client.post(url, {'action': 'approve', 'remarks': 'Approved by manager Priya'}, format='json')

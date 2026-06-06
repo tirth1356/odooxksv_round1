@@ -78,3 +78,38 @@ class MockQuotationComparisonView(APIView):
             })
 
         return Response(data)
+
+
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.shortcuts import get_object_or_404
+from apps.vendors.models import Vendor
+from apps.procurement.models import ActivityLog
+
+class RFQAcceptView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request, rfq_id):
+        rfq = get_object_or_404(RFQ, id=rfq_id)
+        vendor = None
+        if request.user and request.user.is_authenticated:
+            vendor = getattr(request.user, 'vendor_profile', None)
+
+        if not vendor:
+            vendor = Vendor.objects.first()
+
+        if not vendor:
+            return Response({"error": "No vendor profile found"}, status=status.HTTP_400_BAD_REQUEST)
+
+        rfq.accepted_vendors.add(vendor)
+        
+        ActivityLog.objects.create(
+            title="RFQ Accepted",
+            description=f"Vendor '{vendor.vendor_name}' accepted RFQ #{rfq.id}.",
+            category="RFQs"
+        )
+        
+        return Response({
+            "message": "RFQ invitation accepted successfully",
+            "accepted_vendors": [v.vendor_name for v in rfq.accepted_vendors.all()]
+        })

@@ -46,7 +46,10 @@ export default function Approvals({ setActiveTab }) {
         setStatus(responseData.data.status);
         setRemarks(responseData.data.remarks || '');
         setApprovalChain(responseData.data.approval_chain || []);
-        showToast('Quotation L2 approved successfully! Forwarded to David Chen for final review.');
+        showToast('Quotation L2 approved successfully! Forwarded to David Chen for final PO generation.');
+        setTimeout(() => {
+          setActiveTab('Purchase Orders');
+        }, 2000);
       } else {
         showAlert('Error approving quotation.');
       }
@@ -72,6 +75,9 @@ export default function Approvals({ setActiveTab }) {
         setRemarks(responseData.data.remarks || '');
         setApprovalChain(responseData.data.approval_chain || []);
         showToast('Quotation has been rejected with comments: "' + remarks + '"');
+        setTimeout(() => {
+          setActiveTab('Dashboard');
+        }, 2000);
       } else {
         showAlert('Error rejecting quotation.');
       }

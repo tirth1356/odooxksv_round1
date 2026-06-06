@@ -16,6 +16,7 @@ class RFQ(models.Model):
     description = models.TextField(blank=True, default='')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Open')
     assigned_vendors = models.ManyToManyField(Vendor, related_name='assigned_rfqs', blank=True)
+    accepted_vendors = models.ManyToManyField(Vendor, related_name='accepted_rfqs', blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

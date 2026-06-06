@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDialog } from '../context/DialogContext';
 import { API_BASE_URL } from '../config';
 
-export default function RFQContainer({ setActiveTab }) {
+export default function RFQContainer({ setActiveTab, userRole, onSelectRFQ }) {
   const { showAlert, showPrompt, showToast } = useDialog();
   const [step, setStep] = useState(1);
   const [title, setTitle] = useState('');
@@ -13,6 +13,94 @@ export default function RFQContainer({ setActiveTab }) {
   const [lineItems, setLineItems] = useState([]);
   const [assignedVendors, setAssignedVendors] = useState([]);
   const [attachments, setAttachments] = useState([]);
+  const [registeredVendors, setRegisteredVendors] = useState([]);
+  
+  const [rfqList, setRfqList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [vendorName, setVendorName] = useState('');
+
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setVendorName(payload.name || '');
+      }
+    } catch (e) {
+      console.error('Error decoding token:', e);
+    }
+  }, []);
+
+  const handleAcceptRFQ = async (rfqId) => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch(`${API_BASE_URL}/api/rfqs/${rfqId}/accept/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        showToast('RFQ accepted successfully! You can now submit your quotation.');
+        const resList = await fetch(`${API_BASE_URL}/api/rfqs/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (resList.ok) {
+          const data = await resList.json();
+          setRfqList(data);
+        }
+      } else {
+        showAlert('Failed to accept RFQ.');
+      }
+    } catch (err) {
+      console.error(err);
+      showAlert('Network error trying to accept RFQ.');
+    }
+  };
+
+  useEffect(() => {
+    const fetchRFQs = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const res = await fetch(`${API_BASE_URL}/api/rfqs/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setRfqList(data);
+        }
+      } catch (err) {
+        console.error('Error fetching RFQs:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRFQs();
+  }, []);
+
+  useEffect(() => {
+    const fetchRegisteredVendors = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const res = await fetch(`${API_BASE_URL}/api/vendors/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setRegisteredVendors(data);
+        }
+      } catch (err) {
+        console.error('Error fetching registered vendors:', err);
+      }
+    };
+    fetchRegisteredVendors();
+  }, []);
 
   const validateStep1 = () => {
     if (!title.trim()) {
@@ -118,6 +206,120 @@ export default function RFQContainer({ setActiveTab }) {
       showAlert('Network error connecting to backend.');
     }
   };
+
+  if (userRole === 'Vendor') {
+    const invitations = rfqList.filter(rfq => rfq.assigned_vendors && rfq.assigned_vendors.includes(vendorName));
+    
+    return (
+      <div className="space-y-6">
+        <header>
+          <div className="flex items-center gap-2 text-on-surface-variant text-body-sm mb-2">
+            <span className="text-primary">RFQs</span>
+            <span className="material-symbols-outlined text-xs">chevron_right</span>
+            <span>Invitations</span>
+          </div>
+          <h2 className="font-headline-md text-headline-md text-on-surface">RFQ Invitations</h2>
+          <p className="text-on-surface-variant font-body-md">Review requests for quotations sent to you by the procurement team and submit your bids.</p>
+        </header>
+
+        <div className="glass-card rounded-xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-outline-variant flex justify-between items-center">
+            <h3 className="font-title-sm text-title-sm text-on-surface">Active Requests ({invitations.length})</h3>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-surface-container-highest/30">
+                <tr className="border-b border-outline-variant text-[11px] font-label-caps text-on-surface-variant uppercase">
+                  <th className="px-6 py-3">RFQ ID</th>
+                  <th className="px-6 py-3">Title</th>
+                  <th className="px-6 py-3">Category</th>
+                  <th className="px-6 py-3">Deadline</th>
+                  <th className="px-6 py-3">Status</th>
+                  <th className="px-6 py-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-outline-variant/30 text-body-md">
+                {loading ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant opacity-60">
+                      Loading invitations...
+                    </td>
+                  </tr>
+                ) : invitations.length > 0 ? (
+                  invitations.map((rfq) => {
+                    const accepted = rfq.accepted_vendors && rfq.accepted_vendors.includes(vendorName);
+                    const submitted = rfq.quotations && rfq.quotations.some(q => q.vendor_name === vendorName);
+                    return (
+                      <tr key={rfq.id} className="hover:bg-surface-container-high transition-colors">
+                        <td className="px-6 py-4 font-bold text-primary">#{rfq.id}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-on-surface">{rfq.title}</span>
+                            <span className="text-xs text-on-surface-variant">{rfq.description || 'No description provided.'}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="px-2.5 py-0.5 rounded-full text-[11px] bg-secondary-container/10 text-secondary border border-secondary/20 font-semibold">
+                            {rfq.category}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 font-mono text-on-surface-variant">{rfq.deadline}</td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                            submitted
+                              ? 'bg-primary-container/10 text-primary border border-primary/20'
+                              : accepted
+                              ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                              : 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${
+                              submitted ? 'bg-primary' : accepted ? 'bg-blue-400' : 'bg-yellow-400'
+                            }`}></span>
+                            {submitted ? 'Bid Submitted' : accepted ? 'Accepted' : 'Invited'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {!accepted ? (
+                            <button
+                              onClick={() => handleAcceptRFQ(rfq.id)}
+                              className="px-4 py-2 rounded-lg font-bold text-xs bg-yellow-500 text-black shadow-lg shadow-yellow-500/20 hover:brightness-110 hover:scale-[1.02] transition-all"
+                            >
+                              Accept RFQ
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                onSelectRFQ(rfq);
+                                setActiveTab('Quotations');
+                              }}
+                              className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${
+                                submitted 
+                                  ? 'bg-surface-container-high border border-outline-variant text-on-surface-variant hover:text-primary hover:border-primary'
+                                  : 'bg-primary text-on-primary shadow-lg shadow-primary/20 hover:brightness-110 hover:scale-[1.02]'
+                              }`}
+                            >
+                              {submitted ? 'Update Bid' : 'Submit Quote'}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant opacity-60">
+                      No invitations found for your vendor account ({vendorName || 'No profile linked'}).
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -337,7 +539,36 @@ export default function RFQContainer({ setActiveTab }) {
               <div className="bg-surface-container p-6 rounded-xl border border-outline-variant/30 relative">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-[11px] font-label-caps text-on-surface-variant uppercase tracking-widest">ASSIGN VENDORS</h3>
-                  <button onClick={handleAddVendor} className="text-primary text-[11px] font-bold">+ ADD VENDOR</button>
+                  {registeredVendors.length > 0 ? (
+                    <select
+                      onChange={(e) => {
+                        const selectedName = e.target.value;
+                        if (!selectedName) return;
+                        if (assignedVendors.some(v => v.name === selectedName)) {
+                          showAlert("Vendor already assigned!");
+                          return;
+                        }
+                        const init = selectedName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                        const colors = [
+                          'bg-emerald-500/10 text-primary',
+                          'bg-blue-500/10 text-blue-400',
+                          'bg-purple-500/10 text-purple-400',
+                          'bg-amber-500/10 text-amber-400'
+                        ];
+                        const color = colors[assignedVendors.length % colors.length];
+                        setAssignedVendors([...assignedVendors, { id: Date.now(), init, name: selectedName, color }]);
+                        e.target.value = '';
+                      }}
+                      className="bg-surface-container border border-outline-variant text-[11px] font-bold rounded px-2 py-1 outline-none text-primary cursor-pointer max-w-[150px]"
+                    >
+                      <option value="">+ ASSIGN VENDOR</option>
+                      {registeredVendors.map(vendor => (
+                        <option key={vendor.id} value={vendor.vendor_name}>{vendor.vendor_name}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <button onClick={handleAddVendor} className="text-primary text-[11px] font-bold">+ ADD VENDOR</button>
+                  )}
                 </div>
 
                 <div className="space-y-2">

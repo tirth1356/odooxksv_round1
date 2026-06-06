@@ -16,6 +16,7 @@ export default function Dashboard({ userRole, onLogout }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [quotationView, setQuotationView] = useState('submit'); // 'submit' or 'compare'
   const [dashboardData, setDashboardData] = useState(null);
+  const [selectedRFQ, setSelectedRFQ] = useState(null);
 
   const [glowStyle, setGlowStyle] = useState({});
 
@@ -40,6 +41,76 @@ export default function Dashboard({ userRole, onLogout }) {
       fetchDashboardData();
     }
   }, [activeTab]);
+
+  const getKpisForRole = () => {
+    const activeRfqs = dashboardData?.kpis?.active_rfqs ?? 12;
+    const pendingApprovals = dashboardData?.kpis?.pending_approvals ?? 5;
+    const spend = dashboardData?.kpis ? `₹ ${dashboardData.kpis.pos_this_month}` : "₹ 2.3L";
+    const overdueInvoices = dashboardData?.kpis?.overdue_invoices ?? 3;
+    const budgetPct = dashboardData?.kpis?.budget_percentage ?? 84;
+    const avgDaysLate = dashboardData?.kpis?.avg_days_late ?? 4;
+    const totalVendors = dashboardData?.kpis?.total_vendors ?? 4;
+    const errorLogs = dashboardData?.kpis?.error_logs ?? 0;
+    const vendorAssigned = dashboardData?.kpis?.vendor_assigned_rfqs ?? 3;
+    const vendorSubmitted = dashboardData?.kpis?.vendor_submitted_bids ?? 2;
+    const vendorActive = dashboardData?.kpis?.vendor_active_orders ?? 1;
+    const vendorUnpaid = dashboardData?.kpis?.vendor_unpaid_invoices ?? 1;
+
+    if (userRole === 'Vendor') {
+      return [
+        { label: 'Assigned RFQs', value: vendorAssigned, icon: 'request_quote', sub: 'Awaiting your bid', color: 'text-primary' },
+        { label: 'Submitted Bids', value: vendorSubmitted, icon: 'send', sub: 'Under review', color: 'text-secondary' },
+        { label: 'Active Orders', value: vendorActive, icon: 'shopping_cart', sub: 'Delivery in progress', color: 'text-primary' },
+        { label: 'Unpaid Invoices', value: vendorUnpaid, icon: 'description', sub: 'Awaiting payout', color: 'text-error' },
+      ];
+    } else if (userRole === 'Manager') {
+      return [
+        { label: 'Pending Approvals', value: pendingApprovals, icon: 'fact_check', sub: 'Requires action', color: 'text-error' },
+        { label: 'Total PO Spend', value: spend, icon: 'payments', sub: 'Authorized this month', color: 'text-primary' },
+        { label: 'Active RFQs', value: activeRfqs, icon: 'request_quote', sub: 'In circulation', color: 'text-secondary' },
+        { label: 'Budget Utilized', value: `${budgetPct}%`, icon: 'analytics', sub: 'Within yearly limit', color: 'text-primary', progress: budgetPct },
+      ];
+    } else if (userRole === 'Admin') {
+      return [
+        { label: 'System Status', value: 'Online', icon: 'dns', sub: 'All systems operational', color: 'text-primary' },
+        { label: 'Total Vendors', value: totalVendors, icon: 'groups', sub: 'Registered database', color: 'text-secondary' },
+        { label: 'Pending Approvals', value: pendingApprovals, icon: 'fact_check', sub: 'ERP Queue', color: 'text-primary' },
+        { label: 'Error Logs', value: errorLogs, icon: 'error', sub: 'Last 24 hours', color: 'text-primary' },
+      ];
+    } else { // Procurement Officer (Default)
+      return [
+        { label: 'Active RFQs', value: activeRfqs, icon: 'request_quote', sub: '+2 this week', color: 'text-primary' },
+        { label: 'Pending Approvals', value: pendingApprovals, icon: 'fact_check', sub: 'Priority: L2', color: 'text-secondary' },
+        { label: 'Monthly Spend', value: spend, icon: 'payments', sub: `${budgetPct}% of budget`, color: 'text-primary', progress: budgetPct },
+        { label: 'Overdue Invoices', value: overdueInvoices, icon: 'warning', sub: `Avg ${avgDaysLate} days late`, color: 'text-error' },
+      ];
+    }
+  };
+
+  const handleNotificationClick = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch(`${API_BASE_URL}/api/procurement/activity-logs/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.length > 0) {
+          const list = data.slice(0, 5).map(log => `• [${log.category}] ${log.title}: ${log.description}`).join('\n\n');
+          showAlert(`Recent Activity Notifications:\n\n${list}`);
+        } else {
+          showAlert('Notifications: No recent activity.');
+        }
+      } else {
+        showAlert('Notifications: All systems operational.');
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+      showAlert('Notifications: All systems operational.');
+    }
+  };
 
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -140,15 +211,17 @@ export default function Dashboard({ userRole, onLogout }) {
           </div>
 
           <div className="flex items-center gap-6">
-            <button 
-              onClick={() => setActiveTab('RFQs')}
-              className="bg-primary hover:bg-primary/90 text-on-primary font-bold px-4 py-2 rounded-lg text-body-sm transition-all shadow-lg shadow-primary/10"
-            >
-              Create RFQ
-            </button>
+            {['Procurement Officer', 'Manager', 'Admin'].includes(userRole) && (
+              <button 
+                onClick={() => setActiveTab('RFQs')}
+                className="bg-primary hover:bg-primary/90 text-on-primary font-bold px-4 py-2 rounded-lg text-body-sm transition-all shadow-lg shadow-primary/10"
+              >
+                Create RFQ
+              </button>
+            )}
             <div className="flex items-center gap-4 text-on-surface-variant">
               <button 
-                onClick={() => showAlert('Notifications: All systems operational.')}
+                onClick={handleNotificationClick}
                 className="hover:bg-surface-container-highest/50 p-2 rounded-lg transition-colors relative"
               >
                 <span className="material-symbols-outlined">notifications</span>
@@ -182,67 +255,32 @@ export default function Dashboard({ userRole, onLogout }) {
             <>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group hover:border-primary/40 transition-all duration-300">
-                  <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <span className="material-symbols-outlined text-[48px] text-primary">request_quote</span>
+                {getKpisForRole().map((kpi, idx) => (
+                  <div key={idx} className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group hover:border-primary/40 transition-all duration-300">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <span className="material-symbols-outlined text-[48px] text-primary">{kpi.icon}</span>
+                    </div>
+                    <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">{kpi.label}</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display-lg text-display-lg text-on-surface">{kpi.value}</span>
+                      <span className="text-on-surface-variant text-[12px] font-bold">{kpi.sub}</span>
+                    </div>
+                    {kpi.progress !== undefined && (
+                      <div className="mt-2 h-1 w-full bg-surface-container rounded-full overflow-hidden">
+                        <div className="h-full bg-primary" style={{ width: `${kpi.progress}%` }}></div>
+                      </div>
+                    )}
                   </div>
-                  <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Active RFQs</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-display-lg text-display-lg text-on-surface">
-                      {dashboardData?.kpis?.active_rfqs ?? 12}
-                    </span>
-                    <span className="text-primary text-[12px] font-bold">+2 this week</span>
-                  </div>
-                </div>
-
-                <div className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group hover:border-primary/40 transition-all duration-300">
-                  <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <span className="material-symbols-outlined text-[48px] text-primary">fact_check</span>
-                  </div>
-                  <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Pending Approvals</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-display-lg text-display-lg text-on-surface">
-                      {dashboardData?.kpis?.pending_approvals ?? 5}
-                    </span>
-                    <span className="text-error text-[12px] font-bold">Priority: 2</span>
-                  </div>
-                </div>
-
-                <div className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group border-primary/20 hover:border-primary/50 transition-all duration-300">
-                  <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <span className="material-symbols-outlined text-[48px] text-primary">payments</span>
-                  </div>
-                  <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Monthly Spend</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-display-lg text-display-lg text-primary">
-                      {dashboardData?.kpis ? `₹ ${dashboardData.kpis.pos_this_month}` : "₹ 2.3L"}
-                    </span>
-                    <span className="text-on-surface-variant text-[12px]">{dashboardData?.kpis?.budget_percentage ?? 84}% of budget</span>
-                  </div>
-                  <div className="mt-2 h-1 w-full bg-surface-container rounded-full overflow-hidden">
-                    <div className="h-full bg-primary" style={{ width: `${dashboardData?.kpis?.budget_percentage ?? 84}%` }}></div>
-                  </div>
-                </div>
-
-                <div className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group border-error-container/20 hover:border-error/50 transition-all duration-300">
-                  <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <span className="material-symbols-outlined text-[48px] text-error">priority_high</span>
-                  </div>
-                  <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Overdue Invoices</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-display-lg text-display-lg text-error">
-                      {dashboardData?.kpis?.overdue_invoices ?? 3}
-                    </span>
-                    <span className="text-on-surface-variant text-[12px]">Avg {dashboardData?.kpis?.avg_days_late ?? 4} days late</span>
-                  </div>
-                </div>
+                ))}
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
                 <div className="xl:col-span-2 glass-card rounded-xl overflow-hidden flex flex-col">
                   <div className="px-6 py-4 border-b border-outline-variant flex justify-between items-center">
-                    <h2 className="font-title-sm text-title-sm text-on-surface">Recent Purchase Orders</h2>
+                    <h2 className="font-title-sm text-title-sm text-on-surface">
+                      {userRole === 'Vendor' ? 'My Recent Orders' : 'Recent Purchase Orders'}
+                    </h2>
                     <a className="text-primary text-body-sm hover:underline" href="#" onClick={(e) => { e.preventDefault(); setActiveTab('Purchase Orders'); }}>View All</a>
                   </div>
                   <div className="overflow-x-auto">
@@ -298,8 +336,12 @@ export default function Dashboard({ userRole, onLogout }) {
 
                 <div className="glass-card rounded-xl overflow-hidden flex flex-col h-full">
                   <div className="px-6 py-4 border-b border-outline-variant">
-                    <h2 className="font-title-sm text-title-sm text-on-surface">Spending Trends</h2>
-                    <span className="text-body-sm text-on-surface-variant">Last 6 months</span>
+                    <h2 className="font-title-sm text-title-sm text-on-surface">
+                      {userRole === 'Vendor' ? 'Bid Status Breakdown' : 'Spending Breakdown'}
+                    </h2>
+                    <span className="text-body-sm text-on-surface-variant">
+                      {userRole === 'Vendor' ? 'Quotations by current status' : 'Last 6 months'}
+                    </span>
                   </div>
                   <div className="p-6 flex-1 flex flex-col justify-center items-center">
                     <div className="relative w-48 h-48 mb-6">
@@ -324,10 +366,10 @@ export default function Dashboard({ userRole, onLogout }) {
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <span className="text-display-lg font-bold text-on-surface">
-                          {dashboardData?.spending_categories?.[0]?.percentage ?? 65}%
+                          {dashboardData?.spending_categories?.[0]?.percentage ?? (userRole === 'Vendor' ? 0 : 65)}%
                         </span>
                         <span className="text-label-caps font-label-caps text-on-surface-variant uppercase text-center px-4 leading-tight">
-                          {dashboardData?.spending_categories?.[0]?.name ?? 'LOGISTICS'}
+                          {dashboardData?.spending_categories?.[0]?.name ?? (userRole === 'Vendor' ? 'No Bids' : 'LOGISTICS')}
                         </span>
                       </div>
                     </div>
@@ -407,10 +449,10 @@ export default function Dashboard({ userRole, onLogout }) {
           ) : activeTab === 'Vendors' ? (
             <VendorMgmt setActiveTab={setActiveTab} />
           ) : activeTab === 'RFQs' ? (
-            <RFQContainer setActiveTab={setActiveTab} />
+            <RFQContainer setActiveTab={setActiveTab} userRole={userRole} onSelectRFQ={setSelectedRFQ} />
           ) : activeTab === 'Quotations' ? (
             quotationView === 'submit' ? (
-              <Quotations onBackToRFQs={() => setActiveTab('RFQs')} onCompare={() => setQuotationView('compare')} setActiveTab={setActiveTab} />
+              <Quotations onBackToRFQs={() => setActiveTab('RFQs')} onCompare={() => setQuotationView('compare')} setActiveTab={setActiveTab} selectedRFQ={selectedRFQ} />
             ) : (
               <QuotationComparison onBack={() => setQuotationView('submit')} setActiveTab={setActiveTab} />
             )

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDialog } from '../context/DialogContext';
 import { API_BASE_URL } from '../config';
 
-export default function Quotations({ onBackToRFQs, onCompare }) {
+export default function Quotations({ onBackToRFQs, onCompare, selectedRFQ }) {
   const { showAlert, showPrompt, showToast } = useDialog();
   const [taxRate, setTaxRate] = useState(18); // 18%
   const [validity, setValidity] = useState('30 Days');
@@ -12,6 +12,20 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
     { id: 1, desc: 'Ergonomic chair', icon: 'chair', qty: 25, unitPrice: 5500, deliveryDays: 10 },
     { id: 2, desc: 'Standing desks', icon: 'desk', qty: 10, unitPrice: 3200, deliveryDays: 10 }
   ]);
+
+  useEffect(() => {
+    if (selectedRFQ) {
+      const items = (selectedRFQ.line_items || []).map((item, idx) => ({
+        id: item.id || idx,
+        desc: item.item,
+        icon: item.item.toLowerCase().includes('chair') ? 'chair' : item.item.toLowerCase().includes('desk') ? 'desk' : 'deployed_code',
+        qty: item.qty,
+        unitPrice: 0,
+        deliveryDays: 7
+      }));
+      setLineItems(items);
+    }
+  }, [selectedRFQ]);
 
   const handleUnitPriceChange = (id, newPrice) => {
     setLineItems(lineItems.map(item => {
@@ -69,7 +83,7 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
 
   const handleSubmit = async (isDraft) => {
     const quoteData = {
-      rfq_id: "99321",
+      rfq_id: selectedRFQ ? String(selectedRFQ.id) : "99321",
       tax_rate: taxRate,
       validity: validity,
       payment_terms: paymentTerms,
@@ -130,10 +144,10 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
           </button>
           <h2 className="font-headline-md text-headline-md text-on-surface mb-2">Submit Quotation</h2>
           <div className="flex items-center gap-4 text-on-surface-variant font-body-md">
-            <span className="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[12px] font-label-caps">RFQ ID: #99321</span>
+            <span className="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[12px] font-label-caps">RFQ ID: #{selectedRFQ ? selectedRFQ.id : '99321'}</span>
             <span className="flex items-center gap-1">
               <span className="material-symbols-outlined text-[18px]">event</span> 
-              Deadline: 15 June 2025
+              Deadline: {selectedRFQ ? selectedRFQ.deadline : '15 June 2025'}
             </span>
           </div>
         </div>
@@ -159,8 +173,8 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
               RFQ SUMMARY
             </h3>
             <div className="flex flex-col gap-1">
-              <p className="font-title-sm text-title-sm text-on-surface">Office Furniture Procurement Q2</p>
-              <p className="text-on-surface-variant font-body-md">Ergonomic chair × 25, standing desk × 10 — Category: Furniture &amp; Workspace Enhancement</p>
+              <p className="font-title-sm text-title-sm text-on-surface">{selectedRFQ ? selectedRFQ.title : 'Office Furniture Procurement Q2'}</p>
+              <p className="text-on-surface-variant font-body-md">{selectedRFQ ? (selectedRFQ.description || 'No description provided.') : 'Ergonomic chair × 25, standing desk × 10 — Category: Furniture & Workspace Enhancement'}</p>
             </div>
           </section>
 
