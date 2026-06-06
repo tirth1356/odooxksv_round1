@@ -36,3 +36,23 @@ class Vendor(models.Model):
 
     def __str__(self):
         return self.vendor_name
+
+# Signal to auto-create Vendor profile
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_vendor_profile(sender, instance, created, **kwargs):
+    if instance.role == 'Vendor':
+        try:
+            if not hasattr(instance, 'vendor_profile') or instance.vendor_profile is None:
+                Vendor.objects.create(
+                    user=instance,
+                    vendor_name=f"{instance.first_name} {instance.last_name}".strip() or instance.username,
+                    category="Other",
+                    gst_no="27AABCS1429Bz0",
+                    contact_no=instance.phone_number or "0000000000",
+                    status="Active"
+                )
+        except Exception:
+            pass
