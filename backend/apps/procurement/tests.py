@@ -83,7 +83,7 @@ class MockAPITests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], 'L2 Pending')
-        self.assertEqual(response.data['rfq_title'], 'Office Furniture Q2')
+        self.assertEqual(response.data['rfq_title'], 'Office Furniture procurement Q2')
         
         # Test POST approve
         response = self.client.post(url, {'action': 'approve', 'remarks': 'Approved by manager Priya'}, format='json')
@@ -103,7 +103,7 @@ class MockAPITests(APITestCase):
         # Test GET
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['po_number'], 'PO-2024-0068')
+        self.assertEqual(response.data['po_number'], 'PO-2026-0068')
         
         # Test POST cancel
         response = self.client.post(url, {'action': 'cancel'}, format='json')
@@ -116,7 +116,7 @@ class MockAPITests(APITestCase):
         # Test GET
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['invoice_number'], 'INV-2024-0091')
+        self.assertEqual(response.data['invoice_number'], 'INV-2026-0091')
         
         # Test POST pay
         response = self.client.post(url, {'action': 'pay'}, format='json')

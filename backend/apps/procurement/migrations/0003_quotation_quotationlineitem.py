@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('procurement', '0002_invoice_vendor_name_purchaseorder_vendor_name'),
+        ('procurement', '0001_initial'),
     ]
 
     operations = [
