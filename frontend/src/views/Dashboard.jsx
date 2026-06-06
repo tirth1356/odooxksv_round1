@@ -217,10 +217,10 @@ export default function Dashboard({ userRole, onLogout }) {
                     <span className="font-display-lg text-display-lg text-primary">
                       {dashboardData?.kpis ? `₹ ${dashboardData.kpis.pos_this_month}` : "₹ 2.3L"}
                     </span>
-                    <span className="text-on-surface-variant text-[12px]">84% of budget</span>
+                    <span className="text-on-surface-variant text-[12px]">{dashboardData?.kpis?.budget_percentage ?? 84}% of budget</span>
                   </div>
                   <div className="mt-2 h-1 w-full bg-surface-container rounded-full overflow-hidden">
-                    <div className="h-full bg-primary w-[84%]"></div>
+                    <div className="h-full bg-primary" style={{ width: `${dashboardData?.kpis?.budget_percentage ?? 84}%` }}></div>
                   </div>
                 </div>
 
@@ -233,7 +233,7 @@ export default function Dashboard({ userRole, onLogout }) {
                     <span className="font-display-lg text-display-lg text-error">
                       {dashboardData?.kpis?.overdue_invoices ?? 3}
                     </span>
-                    <span className="text-on-surface-variant text-[12px]">Avg 4 days late</span>
+                    <span className="text-on-surface-variant text-[12px]">Avg {dashboardData?.kpis?.avg_days_late ?? 4} days late</span>
                   </div>
                 </div>
               </div>
@@ -306,37 +306,68 @@ export default function Dashboard({ userRole, onLogout }) {
 
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                         <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#2d3449" strokeDasharray="100, 100" strokeWidth="4"></path>
-                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#4edea3" strokeDasharray="65, 100" strokeWidth="4"></path>
-                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#95d3ba" strokeDasharray="25, 100" strokeDashoffset="-65" strokeWidth="4"></path>
+                        {dashboardData?.spending_categories ? (() => {
+                          let currentOffset = 0;
+                          return dashboardData.spending_categories.map((cat) => {
+                            const offset = currentOffset;
+                            currentOffset += cat.percentage;
+                            return (
+                              <path key={cat.name} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke={cat.color} strokeDasharray={`${cat.percentage}, 100`} strokeDashoffset={offset === 0 ? 0 : `-${offset}`} strokeWidth="4"></path>
+                            );
+                          });
+                        })() : (
+                          <>
+                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#4edea3" strokeDasharray="65, 100" strokeWidth="4"></path>
+                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#95d3ba" strokeDasharray="25, 100" strokeDashoffset="-65" strokeWidth="4"></path>
+                          </>
+                        )}
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-display-lg font-bold text-on-surface">65%</span>
-                        <span className="text-label-caps font-label-caps text-on-surface-variant">LOGISTICS</span>
+                        <span className="text-display-lg font-bold text-on-surface">
+                          {dashboardData?.spending_categories?.[0]?.percentage ?? 65}%
+                        </span>
+                        <span className="text-label-caps font-label-caps text-on-surface-variant uppercase text-center px-4 leading-tight">
+                          {dashboardData?.spending_categories?.[0]?.name ?? 'LOGISTICS'}
+                        </span>
                       </div>
                     </div>
 
                     <div className="w-full space-y-3">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <span className="w-3 h-3 bg-primary rounded-full"></span>
-                          <span className="text-body-sm text-on-surface">Logistics</span>
-                        </div>
-                        <span className="text-body-sm font-bold">₹ 1.2M</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <span className="w-3 h-3 bg-secondary rounded-full"></span>
-                          <span className="text-body-sm text-on-surface">IT Services</span>
-                        </div>
-                        <span className="text-body-sm font-bold">₹ 450K</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <span className="w-3 h-3 bg-surface-container-highest rounded-full"></span>
-                          <span className="text-body-sm text-on-surface">Other</span>
-                        </div>
-                        <span className="text-body-sm font-bold">₹ 650K</span>
-                      </div>
+                      {dashboardData?.spending_categories ? (
+                        dashboardData.spending_categories.map((cat) => (
+                          <div key={cat.name} className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }}></span>
+                              <span className="text-body-sm text-on-surface">{cat.name}</span>
+                            </div>
+                            <span className="text-body-sm font-bold">{cat.amount}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <>
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <span className="w-3 h-3 bg-primary rounded-full"></span>
+                              <span className="text-body-sm text-on-surface">Logistics</span>
+                            </div>
+                            <span className="text-body-sm font-bold">₹ 1.2M</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <span className="w-3 h-3 bg-secondary rounded-full"></span>
+                              <span className="text-body-sm text-on-surface">IT Services</span>
+                            </div>
+                            <span className="text-body-sm font-bold">₹ 450K</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <span className="w-3 h-3 bg-surface-container-highest rounded-full"></span>
+                              <span className="text-body-sm text-on-surface">Other</span>
+                            </div>
+                            <span className="text-body-sm font-bold">₹ 650K</span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

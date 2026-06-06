@@ -39,10 +39,22 @@ class MockDashboardView(APIView):
         total_spend_result = PurchaseOrder.objects.aggregate(total=Sum('grand_total'))
         total_spend = total_spend_result['total'] or 0
 
+        # Dynamic budget percentage (assume a nominal budget of 50 Lakhs / 5M INR for demo purposes)
+        nominal_budget = 5000000
+        budget_percentage = int((float(total_spend) / nominal_budget) * 100) if total_spend > 0 else 0
+
         if total_spend >= 100000:
             pos_this_month = f"{float(total_spend) / 100000:.1f}L"
         else:
             pos_this_month = f"{total_spend:,}"
+
+        # Calculate average days late for overdue invoices
+        overdue_invoices_qs = Invoice.objects.filter(status='Pending Payment', due_date__lt=timezone.now().date())
+        overdue_invoices_count = overdue_invoices_qs.count()
+        avg_days_late = 0
+        if overdue_invoices_count > 0:
+            total_days_late = sum((timezone.now().date() - inv.due_date).days for inv in overdue_invoices_qs)
+            avg_days_late = total_days_late // overdue_invoices_count
 
         # Recent POs with proper FK lookups
         recent_pos = []
@@ -76,18 +88,48 @@ class MockDashboardView(APIView):
         if sum(trend_amounts) == 0 and PurchaseOrder.objects.exists():
             trend_amounts[-2] = float(PurchaseOrder.objects.aggregate(total=Sum('grand_total'))['total'] or 0)
 
+        # Spending categories breakdown for doughnut chart
+        categories_agg = PurchaseOrder.objects.values('vendor__category').annotate(total=Sum('grand_total')).order_by('-total')
+        total_all_spend = sum(float(c['total'] or 0) for c in categories_agg)
+        
+        spending_categories = []
+        colors = ['#4edea3', '#ffc107', '#3b82f6', '#ec4899', '#a855f7']
+        
+        for idx, c in enumerate(categories_agg[:3]):
+            cat_name = c['vendor__category'] or 'Other'
+            cat_total = float(c['total'] or 0)
+            percentage = int((cat_total / total_all_spend) * 100) if total_all_spend > 0 else 0
+            
+            # Format currency nicely
+            if cat_total >= 1000000:
+                fmt_amount = f"₹ {cat_total / 1000000:.1f}M"
+            elif cat_total >= 100000:
+                fmt_amount = f"₹ {cat_total / 100000:.1f}L"
+            else:
+                fmt_amount = f"₹ {cat_total / 1000:.1f}K"
+                
+            spending_categories.append({
+                "name": cat_name,
+                "amount": fmt_amount,
+                "percentage": percentage,
+                "color": colors[idx % len(colors)]
+            })
+
         data = {
             "kpis": {
                 "active_rfqs": active_rfqs_count,
                 "pending_approvals": pending_approvals,
                 "pos_this_month": pos_this_month,
-                "overdue_invoices": overdue_invoices
+                "overdue_invoices": overdue_invoices_count,
+                "avg_days_late": avg_days_late,
+                "budget_percentage": budget_percentage
             },
             "recent_purchase_orders": recent_pos,
             "spending_trends": {
                 "months": trend_months,
                 "amounts": trend_amounts
-            }
+            },
+            "spending_categories": spending_categories
         }
         return Response(data)
 

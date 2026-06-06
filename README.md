@@ -1,6 +1,6 @@
 # VendorBridge Procurement ERP
 
-**Deployed Link:** [VendorBridge Live on Vercel](https://your-vercel-domain-here.vercel.app) *(Add your actual Vercel link here)*
+**Deployed Link:** [VendorBridge Live on Vercel](https://odooxksv-round1.vercel.app/) 
 
 An end-to-end cloud-based Procurement and Vendor Management System built for seamless, transparent, and efficient supply chain operations. 
 
