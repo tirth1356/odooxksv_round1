@@ -1,0 +1,29 @@
+# Python/Django gitignore
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+db.sqlite3
+db.sqlite3-journal
+*.db
+.env
+.venv
+venv/
+ENV/
+env/
+
+# Node/React gitignore
+node_modules/
+dist/
+dist-ssr/
+*.local
+.eslintcache
+
+# Logs and temp files
+*.log
+local_settings.py
+
+# OS-specific files
+.DS_Store
+Thumbs.db
