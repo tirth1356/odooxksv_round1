@@ -129,8 +129,32 @@ export default function App() {
       });
       const data = await res.json();
       if (res.ok) {
-        setAuthSuccess('Partner registration submitted successfully! You may now log in.');
-        setScreen('login');
+        // Auto-login the user after registration
+        try {
+          const loginRes = await fetch(`${API_BASE_URL}/api/auth/login/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: regEmail, password: regPassword }),
+          });
+          if (loginRes.ok) {
+            const loginData = await loginRes.json();
+            localStorage.setItem('access_token', loginData.access);
+            localStorage.setItem('refresh_token', loginData.refresh);
+            try {
+              const tokenPayload = JSON.parse(atob(loginData.access.split('.')[1]));
+              setUserRole(tokenPayload.role || 'Vendor');
+            } catch(e) {
+              setUserRole('Vendor');
+            }
+            setScreen('dashboard');
+          } else {
+            setAuthSuccess('Registration successful! Please log in.');
+            setScreen('login');
+          }
+        } catch(e) {
+          setAuthSuccess('Registration successful! Please log in.');
+          setScreen('login');
+        }
         setRegStep(1);
       } else {
         let errorMsg = '';

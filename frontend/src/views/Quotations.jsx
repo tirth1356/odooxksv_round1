@@ -9,8 +9,9 @@ export default function Quotations({ onBackToRFQs, onCompare, selectedRFQ }) {
   const [paymentTerms, setPaymentTerms] = useState('Payment terms: 20 days net. Standard 1-year warranty included for all furniture items. Shipping included in the quoted price.');
 
   const [lineItems, setLineItems] = useState([
-    { id: 1, desc: 'Ergonomic chair', icon: 'chair', qty: 25, unitPrice: 5500, deliveryDays: 10 },
-    { id: 2, desc: 'Standing desks', icon: 'desk', qty: 10, unitPrice: 3200, deliveryDays: 10 }
+    { id: 1, desc: 'Enterprise Blade Server Chassis', icon: 'dns', qty: 5, unitPrice: 1250000, deliveryDays: 14 },
+    { id: 2, desc: '40G Network Core Switch', icon: 'router', qty: 2, unitPrice: 480000, deliveryDays: 21 },
+    { id: 3, desc: '2TB NVMe Enterprise SSD', icon: 'memory', qty: 40, unitPrice: 32000, deliveryDays: 7 }
   ]);
 
   useEffect(() => {
@@ -119,7 +120,7 @@ export default function Quotations({ onBackToRFQs, onCompare, selectedRFQ }) {
           setLineItems([]);
           setTaxRate(18);
           setValidity('30 Days');
-          setPaymentTerms('Payment terms: 20 days net. Standard 1-year warranty included for all furniture items. Shipping included in the quoted price.');
+          setPaymentTerms('Payment terms: 30 days net. Standard 3-year enterprise warranty included for all hardware. Shipping & installation included.');
         }
       } else {
         const errorData = await res.json();
@@ -173,8 +174,8 @@ export default function Quotations({ onBackToRFQs, onCompare, selectedRFQ }) {
               RFQ SUMMARY
             </h3>
             <div className="flex flex-col gap-1">
-              <p className="font-title-sm text-title-sm text-on-surface">{selectedRFQ ? selectedRFQ.title : 'Office Furniture Procurement Q2'}</p>
-              <p className="text-on-surface-variant font-body-md">{selectedRFQ ? (selectedRFQ.description || 'No description provided.') : 'Ergonomic chair × 25, standing desk × 10 — Category: Furniture & Workspace Enhancement'}</p>
+              <p className="font-title-sm text-title-sm text-on-surface">{selectedRFQ ? selectedRFQ.title : 'Data Center Infrastructure Upgrade Q3'}</p>
+              <p className="text-on-surface-variant font-body-md">{selectedRFQ ? (selectedRFQ.description || 'No description provided.') : 'Enterprise Blade Servers × 5, Network Switches × 2, NVMe Storage × 40 — Category: IT Infrastructure & Hardware'}</p>
             </div>
           </section>
 

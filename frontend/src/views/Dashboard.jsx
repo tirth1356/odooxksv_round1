@@ -7,6 +7,7 @@ import Approvals from './Approvals';
 import DocumentViewer from './DocumentViewer';
 import Activity from './Activity';
 import Reports from './Reports';
+import VendorRFQs from './VendorRFQs';
 import { useDialog } from '../context/DialogContext';
 import { API_BASE_URL } from '../config';
 
@@ -253,7 +254,6 @@ export default function Dashboard({ userRole, onLogout }) {
             </div>
           ) : activeTab === 'Dashboard' ? (
             <>
-
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {getKpisForRole().map((kpi, idx) => (
                   <div key={idx} className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group hover:border-primary/40 transition-all duration-300">
