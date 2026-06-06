@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
-export default function DocumentViewer() {
+export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' }) {
+  const isPO = documentType === 'PO';
   const [paymentStatus, setPaymentStatus] = useState('Pending Payment'); // 'Pending Payment', 'Paid', 'Cancelled'
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
-  
+
   const [timeline, setTimeline] = useState([]);
 
   const triggerToast = (message) => {
@@ -18,8 +19,7 @@ export default function DocumentViewer() {
   const handleMarkAsPaid = () => {
     if (paymentStatus === 'Paid') return;
     setPaymentStatus('Paid');
-    
-    // Update timeline
+
     const updatedTimeline = [
       { id: 5, title: 'Paid by Alex Thompson', time: 'Just now', completed: true },
       ...timeline.map(t => {
@@ -36,31 +36,35 @@ export default function DocumentViewer() {
   const handleCancelPO = () => {
     if (paymentStatus === 'Cancelled') return;
     setPaymentStatus('Cancelled');
-    
+
     const updatedTimeline = [
-      { id: 6, title: 'PO Cancelled by Alex Thompson', time: 'Just now', completed: true, isError: true },
+      { id: 6, title: isPO ? 'PO Cancelled by Alex Thompson' : 'Invoice Cancelled by Alex Thompson', time: 'Just now', completed: true, isError: true },
       ...timeline
     ];
     setTimeline(updatedTimeline);
-    triggerToast('Purchase Order has been Cancelled.');
+    triggerToast(isPO ? 'Purchase Order has been Cancelled.' : 'Invoice has been Cancelled.');
   };
 
   return (
     <div className="space-y-6 relative">
-      {/* Header Actions */}
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
         <div>
           <nav className="flex gap-2 text-xs font-label-caps text-on-surface-variant mb-2">
-            <span className="hover:text-primary cursor-pointer transition-colors">HOME</span>
+            <span className="hover:text-primary cursor-pointer transition-colors" onClick={() => setActiveTab && setActiveTab('Dashboard')}>HOME</span>
             <span>/</span>
-            <span className="hover:text-primary cursor-pointer transition-colors">INVOICES</span>
+            <span className="hover:text-primary cursor-pointer transition-colors" onClick={() => setActiveTab && setActiveTab(isPO ? 'Purchase Orders' : 'Invoices')}>
+              {isPO ? 'PURCHASE ORDERS' : 'INVOICES'}
+            </span>
             <span>/</span>
-            <span className="text-primary">PO-2024-0068</span>
+            <span className="text-primary">{isPO ? 'PO-2024-0068' : 'INV-2024-0091'}</span>
           </nav>
-          <h2 className="font-display-lg text-display-lg text-on-surface">PO &amp; Invoice Details</h2>
+          <h2 className="font-display-lg text-display-lg text-on-surface">
+            {isPO ? 'Purchase Order Details' : 'Invoice Details'}
+          </h2>
           <p className="text-on-surface-variant font-body-md">Auto-generated after approval of RFQ: Office Furniture Q2</p>
         </div>
-        
+
         <div className="flex flex-wrap gap-3">
           <button 
             onClick={() => triggerToast('The invoice has been downloaded as PDF.')}
@@ -77,24 +81,22 @@ export default function DocumentViewer() {
             <span className="font-label-caps text-label-caps">Print</span>
           </button>
           <button 
-            onClick={() => triggerToast('Invoice sent to vendor email successfully.')}
+            onClick={() => triggerToast(isPO ? 'PO sent to vendor email successfully.' : 'Invoice sent to vendor email successfully.')}
             className="flex items-center gap-2 px-4 py-2 bg-surface-container-high text-on-surface border border-outline-variant rounded-lg hover:border-primary hover:text-primary transition-all text-body-sm"
           >
             <span className="material-symbols-outlined text-[20px]">mail</span>
-            <span className="font-label-caps text-label-caps">Email Invoice</span>
+            <span className="font-label-caps text-label-caps">{isPO ? 'Email PO' : 'Email Invoice'}</span>
           </button>
         </div>
       </div>
 
-      {/* Document Section */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-gutter">
-        {/* Main Document */}
+
         <div className="xl:col-span-8">
           <div className="invoice-canvas rounded-xl p-10 overflow-hidden relative">
-            {/* Glassmorphism Accent */}
+
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[80px] rounded-full -mr-20 -mt-20"></div>
-            
-            {/* Header */}
+
             <div className="flex justify-between items-start relative z-10 mb-12">
               <div>
                 <div className="flex items-center gap-2 mb-4">
@@ -112,8 +114,8 @@ export default function DocumentViewer() {
               </div>
               <div className="text-right space-y-4">
                 <div>
-                  <h3 className="font-label-caps text-label-caps text-primary mb-1">PURCHASE ORDER</h3>
-                  <p className="font-display-lg text-title-sm text-on-surface">#PO-2024-0068</p>
+                  <h3 className="font-label-caps text-label-caps text-primary mb-1">{isPO ? 'PURCHASE ORDER' : 'INVOICE'}</h3>
+                  <p className="font-display-lg text-title-sm text-on-surface">{isPO ? '#PO-2024-0068' : '#INV-2024-0091'}</p>
                 </div>
                 <div className="space-y-1 text-on-surface-variant font-body-sm">
                   <p className="font-bold text-on-surface">Vendor:</p>
@@ -124,34 +126,36 @@ export default function DocumentViewer() {
               </div>
             </div>
 
-            {/* Meta Data */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-6 border-y border-outline-variant mb-8 bg-surface-container/30 px-6 rounded-lg">
               <div>
                 <p className="font-label-caps text-[10px] text-on-surface-variant mb-1 uppercase">PO Date</p>
                 <p className="font-table-data text-body-md text-on-surface">22 May, 2025</p>
               </div>
               <div>
-                <p className="font-label-caps text-[10px] text-on-surface-variant mb-1 uppercase">Invoice Date</p>
-                <p className="font-table-data text-body-md text-on-surface">22 May, 2025</p>
+                <p className="font-label-caps text-[10px] text-on-surface-variant mb-1 uppercase">{isPO ? 'Expected Delivery' : 'Invoice Date'}</p>
+                <p className="font-table-data text-body-md text-on-surface">{isPO ? '05 Jun, 2025' : '22 May, 2025'}</p>
               </div>
+              {!isPO && (
+                <div>
+                  <p className="font-label-caps text-[10px] text-on-surface-variant mb-1 uppercase">Due Date</p>
+                  <p className="font-table-data text-body-md text-on-surface">21 June, 2025</p>
+                </div>
+              )}
               <div>
-                <p className="font-label-caps text-[10px] text-on-surface-variant mb-1 uppercase">Due Date</p>
-                <p className="font-table-data text-body-md text-on-surface">21 June, 2025</p>
-              </div>
-              <div>
-                <p className="font-label-caps text-[10px] text-on-surface-variant mb-1 uppercase">Payment Status</p>
+                <p className="font-label-caps text-[10px] text-on-surface-variant mb-1 uppercase">{isPO ? 'PO Status' : 'Payment Status'}</p>
                 <div className="flex items-center gap-2">
                   <span className={`w-2 h-2 rounded-full ${
                     paymentStatus === 'Paid' ? 'bg-primary' :
                     paymentStatus === 'Cancelled' ? 'bg-error' :
                     'bg-orange-400'
                   }`}></span>
-                  <p className="font-table-data text-body-md text-on-surface">{paymentStatus}</p>
+                  <p className="font-table-data text-body-md text-on-surface">
+                    {isPO ? (paymentStatus === 'Paid' ? 'Completed' : paymentStatus === 'Pending Payment' ? 'Issued' : 'Cancelled') : paymentStatus}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Items Table */}
             <div className="mb-12 overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -172,32 +176,36 @@ export default function DocumentViewer() {
               </table>
             </div>
 
-            {/* Totals */}
             <div className="flex justify-end">
               <div className="w-80 space-y-3 font-body-md">
                 <div className="flex justify-between text-on-surface-variant">
                   <span>Subtotal</span>
                   <span className="text-on-surface font-mono">₹ 1,69,500</span>
                 </div>
-                <div className="flex justify-between text-on-surface-variant">
-                  <span>CGST (9%)</span>
-                  <span className="text-on-surface font-mono">₹ 15,255</span>
-                </div>
-                <div className="flex justify-between text-on-surface-variant">
-                  <span>SGST (9%)</span>
-                  <span className="text-on-surface font-mono">₹ 15,255</span>
-                </div>
+                {!isPO && (
+                  <>
+                    <div className="flex justify-between text-on-surface-variant">
+                      <span>CGST (9%)</span>
+                      <span className="text-on-surface font-mono">₹ 15,255</span>
+                    </div>
+                    <div className="flex justify-between text-on-surface-variant">
+                      <span>SGST (9%)</span>
+                      <span className="text-on-surface font-mono">₹ 15,255</span>
+                    </div>
+                  </>
+                )}
                 <div className="flex justify-between items-center py-3 border-t border-outline-variant mt-2">
-                  <span className="font-bold text-title-sm text-on-surface">Grand Total</span>
-                  <span className="font-display-lg text-title-sm text-primary font-mono">₹ 2,00,010</span>
+                  <span className="font-bold text-title-sm text-on-surface">{isPO ? 'Total Value' : 'Grand Total'}</span>
+                  <span className="font-display-lg text-title-sm text-primary font-mono">{isPO ? '₹ 1,69,500' : '₹ 2,00,010'}</span>
                 </div>
-                <div className="text-[10px] text-right font-label-caps text-on-surface-variant mt-2 italic">
-                  Amount in words: Two Lakhs and Ten Rupees Only.
-                </div>
+                {!isPO && (
+                  <div className="text-[10px] text-right font-label-caps text-on-surface-variant mt-2 italic">
+                    Amount in words: Two Lakhs and Ten Rupees Only.
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Footer */}
             <div className="mt-20 pt-8 border-t border-outline-variant flex justify-between items-end">
               <div className="space-y-1 text-on-surface-variant font-body-sm italic">
                 <p>Terms &amp; Conditions:</p>
@@ -212,32 +220,52 @@ export default function DocumentViewer() {
           </div>
         </div>
 
-        {/* Sidebar Info/Timeline */}
         <div className="xl:col-span-4 space-y-gutter">
-          {/* Status Card */}
+
           <div className="glass-panel rounded-xl p-6">
             <h3 className="font-label-caps text-label-caps text-on-surface-variant mb-4 uppercase">Actions</h3>
             <div className="space-y-3">
-              <button 
-                onClick={handleMarkAsPaid}
-                disabled={paymentStatus === 'Paid' || paymentStatus === 'Cancelled'}
-                className="w-full bg-primary disabled:opacity-50 text-on-primary font-headline-md text-body-md py-3 rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-2"
-              >
-                <span className="material-symbols-outlined">payments</span>
-                Mark as Paid
-              </button>
-              <button 
-                onClick={handleCancelPO}
-                disabled={paymentStatus === 'Paid' || paymentStatus === 'Cancelled'}
-                className="w-full bg-error-container disabled:opacity-50 text-on-error-container font-headline-md text-body-md py-3 rounded-lg hover:brightness-110 transition-all flex items-center justify-center gap-2"
-              >
-                <span className="material-symbols-outlined">cancel</span>
-                Cancel PO
-              </button>
+              {isPO ? (
+                <>
+                  <button 
+                    onClick={() => { triggerToast('Invoice generated successfully.'); setTimeout(() => setActiveTab && setActiveTab('Invoices'), 1500); }}
+                    className="w-full bg-primary text-on-primary font-headline-md text-body-md py-3 rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-2"
+                  >
+                    <span className="material-symbols-outlined">receipt_long</span>
+                    Generate Invoice
+                  </button>
+                  <button 
+                    onClick={handleCancelPO}
+                    disabled={paymentStatus === 'Paid' || paymentStatus === 'Cancelled'}
+                    className="w-full bg-error-container disabled:opacity-50 text-on-error-container font-headline-md text-body-md py-3 rounded-lg hover:brightness-110 transition-all flex items-center justify-center gap-2"
+                  >
+                    <span className="material-symbols-outlined">cancel</span>
+                    Cancel PO
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button 
+                    onClick={handleMarkAsPaid}
+                    disabled={paymentStatus === 'Paid' || paymentStatus === 'Cancelled'}
+                    className="w-full bg-primary disabled:opacity-50 text-on-primary font-headline-md text-body-md py-3 rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-2"
+                  >
+                    <span className="material-symbols-outlined">payments</span>
+                    Mark as Paid
+                  </button>
+                  <button 
+                    onClick={handleCancelPO}
+                    disabled={paymentStatus === 'Paid' || paymentStatus === 'Cancelled'}
+                    className="w-full bg-error-container disabled:opacity-50 text-on-error-container font-headline-md text-body-md py-3 rounded-lg hover:brightness-110 transition-all flex items-center justify-center gap-2"
+                  >
+                    <span className="material-symbols-outlined">cancel</span>
+                    Cancel Invoice
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
-          {/* Vendor Snapshot */}
           <div className="glass-panel rounded-xl p-6">
             <h3 className="font-label-caps text-label-caps text-on-surface-variant mb-4 uppercase">Vendor Profile</h3>
             <div className="flex items-center gap-4 mb-4">
@@ -261,7 +289,6 @@ export default function DocumentViewer() {
             </div>
           </div>
 
-          {/* Audit Log */}
           <div className="glass-panel rounded-xl p-6">
             <h3 className="font-label-caps text-label-caps text-on-surface-variant mb-6 uppercase">PO Timeline</h3>
             <div className="relative space-y-6 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-px before:bg-outline-variant">
@@ -290,7 +317,6 @@ export default function DocumentViewer() {
         </div>
       </div>
 
-      {/* Success Toast Notification */}
       <div 
         className={`fixed bottom-8 right-8 bg-surface-container-highest border border-primary text-on-surface px-6 py-4 rounded-xl flex items-center gap-4 transition-all duration-500 z-[100] shadow-2xl ${
           showToast ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0'

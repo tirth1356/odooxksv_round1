@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useDialog } from '../context/DialogContext';
 
 export default function Quotations({ onBackToRFQs, onCompare }) {
+  const { showAlert, showPrompt } = useDialog();
   const [taxRate, setTaxRate] = useState(18); // 18%
   const [validity, setValidity] = useState('30 Days');
   const [paymentTerms, setPaymentTerms] = useState('Payment terms: 20 days net. Standard 1-year warranty included for all furniture items. Shipping included in the quoted price.');
@@ -25,14 +27,14 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
     }));
   };
 
-  const handleAddCustomItem = () => {
-    const desc = prompt("Enter Custom Item Description:");
+  const handleAddCustomItem = async () => {
+    const desc = await showPrompt("Enter Custom Item Description:");
     if (!desc) return;
-    const qtyStr = prompt("Enter Quantity:");
+    const qtyStr = await showPrompt("Enter Quantity:");
     const qty = parseInt(qtyStr) || 1;
-    const priceStr = prompt("Enter Unit Price ($):");
+    const priceStr = await showPrompt("Enter Unit Price (₹):");
     const unitPrice = parseFloat(priceStr) || 0;
-    const deliveryStr = prompt("Enter Delivery (Days):");
+    const deliveryStr = await showPrompt("Enter Delivery (Days):");
     const deliveryDays = parseInt(deliveryStr) || 7;
 
     setLineItems([
@@ -57,7 +59,6 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
     setTaxRate(numeric);
   };
 
-  // Calculations
   const subtotal = lineItems.reduce((acc, item) => acc + (item.qty * item.unitPrice), 0);
   const gstAmount = subtotal * (taxRate / 100);
   const grandTotal = subtotal + gstAmount;
@@ -74,12 +75,16 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
       status: isDraft ? 'Draft' : 'Submitted'
     };
     console.log('Submitting Quotation:', quoteData);
-    alert(isDraft ? 'Quotation Draft Saved!' : 'Quotation Submitted Successfully!');
+    showAlert(isDraft ? 'Quotation Draft Saved!' : 'Quotation Submitted Successfully!');
+    setLineItems([]);
+    setTaxRate(18);
+    setValidity('30 Days');
+    setPaymentTerms('Payment terms: 20 days net. Standard 1-year warranty included for all furniture items. Shipping included in the quoted price.');
   };
 
   return (
     <div className="space-y-6">
-      {/* Page Header Section */}
+
       <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-700 flex justify-between items-end">
         <div>
           <button 
@@ -110,9 +115,9 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Quotation Form */}
+
         <div className="lg:col-span-2 space-y-6">
-          {/* RFQ Summary Card (Context) */}
+
           <section className="glass-panel p-6 rounded-xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
             <h3 className="font-label-caps text-label-caps text-primary mb-4 flex items-center gap-2">
@@ -125,20 +130,19 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
             </div>
           </section>
 
-          {/* Quotation Line Items Table */}
           <section className="bg-surface-container rounded-xl overflow-hidden border border-outline-variant">
             <div className="p-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-high/50">
               <h3 className="font-label-caps text-label-caps text-on-surface">LINE ITEMS PRICING</h3>
               <span className="text-body-sm text-on-surface-variant">{lineItems.length} Items Listed</span>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead className="bg-surface-container-low">
                   <tr>
                     <th className="px-cell-padding-h py-cell-padding-v font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant">ITEM DESCRIPTION</th>
                     <th className="px-cell-padding-h py-cell-padding-v font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant">QTY</th>
-                    <th className="px-cell-padding-h py-cell-padding-v font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant">UNIT PRICE ($)</th>
+                    <th className="px-cell-padding-h py-cell-padding-v font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant">UNIT PRICE (₹)</th>
                     <th className="px-cell-padding-h py-cell-padding-v font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant">TOTAL</th>
                     <th className="px-cell-padding-h py-cell-padding-v font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant text-right">DELIVERY (DAYS)</th>
                     <th className="px-cell-padding-h py-cell-padding-v border-b border-outline-variant"></th>
@@ -204,7 +208,6 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
             </div>
           </section>
 
-          {/* Terms and Taxes Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="font-label-caps text-label-caps text-on-surface-variant block uppercase px-1">Tax / GST (%)</label>
@@ -242,7 +245,6 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
             />
           </div>
 
-          {/* Action Buttons */}
           <div className="flex items-center justify-end gap-4 pt-4 border-t border-outline-variant">
             <button 
               onClick={() => handleSubmit(true)}
@@ -259,9 +261,8 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
           </div>
         </div>
 
-        {/* Right Column: Quote Summary & Analytics */}
         <div className="space-y-6">
-          {/* Total Calculation Card */}
+
           <section className="bg-surface-container-high rounded-xl p-6 border border-primary/20 shadow-2xl relative">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"></div>
             <h3 className="font-label-caps text-label-caps text-primary-fixed mb-6 uppercase">Calculation Summary</h3>
@@ -285,12 +286,11 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
                     ${grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
-                <p className="text-[10px] font-label-caps text-on-surface-variant mt-1 text-right italic">All prices in USD</p>
+                <p className="text-[10px] font-label-caps text-on-surface-variant mt-1 text-right italic">All prices in INR</p>
               </div>
             </div>
           </section>
 
-          {/* Vendor Stats Widget */}
           <section className="glass-panel rounded-xl p-6">
             <h3 className="font-label-caps text-label-caps text-on-surface-variant mb-4 uppercase">Your Statistics</h3>
             <div className="grid grid-cols-2 gap-4">
@@ -305,7 +305,6 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
             </div>
           </section>
 
-          {/* Competitive Context */}
           <section className="bg-surface-container-low rounded-xl p-6 border border-outline-variant border-dashed">
             <div className="flex items-center gap-3 mb-4 text-on-surface-variant">
               <span className="material-symbols-outlined text-tertiary">insights</span>
@@ -316,7 +315,6 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
             </div>
           </section>
 
-          {/* Logistics Image */}
           <div className="rounded-xl overflow-hidden h-48 relative group">
             <img 
               alt="Warehouse Logistics" 

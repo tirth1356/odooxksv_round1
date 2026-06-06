@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useDialog } from '../context/DialogContext';
 
-export default function Reports() {
+export default function Reports({ setActiveTab }) {
+  const { showAlert, showPrompt } = useDialog();
   const [hoveredMonth, setHoveredMonth] = useState(null);
   const [tickerIndex, setTickerIndex] = useState(0);
   const [selectedRange, setSelectedRange] = useState('May 1, 2025 - May 31, 2025');
@@ -23,23 +25,23 @@ export default function Reports() {
   }, []);
 
   const handleExport = () => {
-    alert(`Exporting analytical report for range: ${selectedRange}`);
+    showAlert(`Exporting analytical report for range: ${selectedRange}`);
   };
 
-  const handleSelectRange = () => {
-    const range = prompt("Enter Custom Date Range (e.g., Q1 2025, May 1 - May 31):", selectedRange);
+  const handleSelectRange = async () => {
+    const range = await showPrompt("Enter Custom Date Range (e.g., Q1 2025, May 1 - May 31):", selectedRange);
     if (range) setSelectedRange(range);
   };
 
   return (
     <div className="space-y-6 relative">
-      {/* Dashboard Header */}
+
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2">
         <div>
           <h2 className="font-headline-md text-headline-md text-on-surface">Reports &amp; Analytics</h2>
           <p className="text-body-md text-on-surface-variant">Procurement Insights Overview for May 2025</p>
         </div>
-        
+
         <div className="flex gap-3">
           <button 
             onClick={handleSelectRange}
@@ -58,12 +60,11 @@ export default function Reports() {
         </div>
       </div>
 
-      {/* KPI Row (The 4 Anchors) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bento-card p-5 rounded-xl relative overflow-hidden group hover:translate-y-[-2px]">
           <div className="relative z-10">
             <p className="text-label-caps font-label-caps text-on-surface-variant mb-1">Total Spend</p>
-            <h3 className="font-display-lg text-display-lg text-primary">$12.4M</h3>
+            <h3 className="font-display-lg text-display-lg text-primary">₹12.4M</h3>
             <div className="flex items-center gap-1 text-primary-fixed text-[11px] mt-2">
               <span className="material-symbols-outlined text-[14px]">trending_up</span>
               <span>+14.2% from last month</span>
@@ -117,17 +118,16 @@ export default function Reports() {
         </div>
       </div>
 
-      {/* Visual Analytics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Spending by Category (Bar Chart Area) */}
+
         <div className="lg:col-span-2 bento-card p-6 rounded-xl flex flex-col hover:translate-y-[-2px]">
           <div className="flex justify-between items-center mb-6">
             <h4 className="font-title-sm text-title-sm text-on-surface">Spending by Category</h4>
-            <button onClick={() => alert('Category options')} className="text-on-surface-variant hover:text-primary transition-colors">
+            <button onClick={() => showAlert('Category options')} className="text-on-surface-variant hover:text-primary transition-colors">
               <span className="material-symbols-outlined">more_vert</span>
             </button>
           </div>
-          
+
           <div className="flex-1 flex flex-col justify-around gap-6">
             {categories.length === 0 && (
               <p className="text-sm text-on-surface-variant opacity-60">No spending data available.</p>
@@ -147,7 +147,7 @@ export default function Reports() {
               </div>
             ))}
           </div>
-          
+
           <div className="mt-8 pt-6 border-t border-outline-variant/30">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
@@ -157,7 +157,7 @@ export default function Reports() {
               <a 
                 className="text-primary text-body-sm hover:underline" 
                 href="#"
-                onClick={(e) => { e.preventDefault(); alert('Opening breakdown details...'); }}
+                onClick={(e) => { e.preventDefault(); showAlert('Opening breakdown details...'); }}
               >
                 View Detailed Breakdown
               </a>
@@ -165,7 +165,6 @@ export default function Reports() {
           </div>
         </div>
 
-        {/* Top Vendors by Spend */}
         <div className="bento-card p-6 rounded-xl hover:translate-y-[-2px] flex flex-col justify-between">
           <div>
             <h4 className="font-title-sm text-title-sm text-on-surface mb-6">Top Vendors by Spend</h4>
@@ -192,9 +191,9 @@ export default function Reports() {
               ))}
             </div>
           </div>
-          
+
           <button 
-            onClick={() => alert('Navigating to full Vendors list...')}
+            onClick={() => setActiveTab('Vendors')}
             className="w-full mt-6 py-2 rounded border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest/40 transition-all text-[12px] font-bold uppercase tracking-wider"
           >
             View All Vendors
@@ -202,12 +201,11 @@ export default function Reports() {
         </div>
       </div>
 
-      {/* Bottom Trend Area */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Monthly Spending Trend */}
+
         <div className="bento-card p-6 rounded-xl hover:translate-y-[-2px] relative">
           <h4 className="font-title-sm text-title-sm text-on-surface mb-6">Monthly Spending Trend</h4>
-          
+
           {hoveredMonth && (
             <div className="absolute top-4 right-6 bg-primary-container text-on-primary-container px-3 py-1 rounded text-xs font-bold shadow-lg">
               {hoveredMonth.month} Spend: {hoveredMonth.spend}
@@ -242,14 +240,13 @@ export default function Reports() {
           </div>
         </div>
 
-        {/* Strategic Summary / Actionable Items */}
         <div className="bento-card p-6 bg-gradient-to-br from-surface-container to-surface rounded-xl hover:translate-y-[-2px] flex flex-col justify-between">
           <div>
             <h4 className="font-title-sm text-title-sm text-on-surface mb-4">Strategic Forecast</h4>
             <div className="space-y-4">
               <div className="p-3 bg-primary-container/10 border-l-4 border-primary rounded-r">
                 <p className="text-body-sm text-primary font-bold">Optimization Opportunity</p>
-                <p className="text-[12px] text-on-surface-variant leading-relaxed">Consolidating IT Hardware vendors could yield a potential 8% saving ($384k annually).</p>
+                <p className="text-[12px] text-on-surface-variant leading-relaxed">Consolidating IT Hardware vendors could yield a potential 8% saving (₹384k annually).</p>
               </div>
               <div className="p-3 bg-secondary-container/10 border-l-4 border-secondary rounded-r">
                 <p className="text-body-sm text-secondary font-bold">Vendor Performance</p>
@@ -257,15 +254,14 @@ export default function Reports() {
               </div>
             </div>
           </div>
-          
+
           <div className="flex gap-2 mt-6">
-            <button onClick={() => alert('Redirecting to Audit Logs...')} className="flex-1 py-2 bg-surface-container-highest text-on-surface text-body-sm font-bold rounded hover:bg-surface-bright transition-all">Audit Logs</button>
-            <button onClick={() => alert('Opening full forecast PDF report...')} className="flex-1 py-2 bg-primary/20 text-primary text-body-sm font-bold rounded hover:bg-primary/30 transition-all">Full Report</button>
+            <button onClick={() => setActiveTab('Activity')} className="flex-1 py-2 bg-surface-container-highest text-on-surface text-body-sm font-bold rounded hover:bg-surface-bright transition-all">Audit Logs</button>
+            <button onClick={() => showAlert('Opening full forecast PDF report...')} className="flex-1 py-2 bg-primary/20 text-primary text-body-sm font-bold rounded hover:bg-primary/30 transition-all">Full Report</button>
           </div>
         </div>
       </div>
 
-      {/* Recent Activity Ticker */}
       <div className="bento-card p-4 rounded-xl flex items-center justify-between hover:border-primary/30 transition-colors">
         <div className="flex items-center gap-4">
           <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>

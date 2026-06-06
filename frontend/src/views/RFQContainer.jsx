@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useDialog } from '../context/DialogContext';
 
-export default function RFQContainer() {
+export default function RFQContainer({ setActiveTab }) {
+  const { showAlert, showPrompt } = useDialog();
   const [step, setStep] = useState(1);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
@@ -16,18 +18,18 @@ export default function RFQContainer() {
     setLineItems(lineItems.filter(item => item.id !== id));
   };
 
-  const handleAddLineItem = () => {
-    const desc = prompt("Enter Item Description:");
+  const handleAddLineItem = async () => {
+    const desc = await showPrompt("Enter Item Description:");
     if (!desc) return;
-    const qtyStr = prompt("Enter Quantity:");
+    const qtyStr = await showPrompt("Enter Quantity:");
     const qty = parseInt(qtyStr) || 1;
-    const unit = prompt("Enter Unit (e.g., NOS, SET, KG):") || "NOS";
+    const unit = await showPrompt("Enter Unit (e.g., NOS, SET, KG):") || "NOS";
 
     setLineItems([...lineItems, { id: Date.now(), desc, qty, unit }]);
   };
 
-  const handleAddVendor = () => {
-    const name = prompt("Enter Vendor Name to Assign:");
+  const handleAddVendor = async () => {
+    const name = await showPrompt("Enter Vendor Name to Assign:");
     if (!name) return;
     const init = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
     const colors = [
@@ -73,21 +75,29 @@ export default function RFQContainer() {
       });
       const resData = await res.json();
       if (res.ok) {
-        alert(isDraft ? 'RFQ Saved as Draft successfully!' : `RFQ '${title}' created and published successfully!`);
+        showAlert(isDraft ? 'RFQ Saved as Draft successfully!' : `RFQ '${title}' created and published successfully!`);
+        setTitle('');
+        setCategory('');
+        setDeadline('');
+        setDescription('');
+        setLineItems([]);
+        setAssignedVendors([]);
+        setAttachments([]);
+        setStep(1);
       } else {
-        alert('Error saving RFQ: ' + (resData.error || JSON.stringify(resData)));
+        showAlert('Error saving RFQ: ' + (resData.error || JSON.stringify(resData)));
       }
     } catch (err) {
-      alert('Network error connecting to backend.');
+      showAlert('Network error connecting to backend.');
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+
       <header>
         <div className="flex items-center gap-2 text-on-surface-variant text-body-sm mb-2">
-          <a className="hover:text-primary" href="#" onClick={(e) => e.preventDefault()}>RFQs</a>
+          <a className="hover:text-primary cursor-pointer" onClick={(e) => { e.preventDefault(); setActiveTab && setActiveTab('RFQs'); }}>RFQs</a>
           <span className="material-symbols-outlined text-xs">chevron_right</span>
           <span>New Request</span>
         </div>
@@ -95,14 +105,13 @@ export default function RFQContainer() {
         <p className="text-on-surface-variant font-body-md">Initiate a new request for quotation to your preferred vendors.</p>
       </header>
 
-      {/* Multi-step Stepper */}
       <div className="relative flex justify-between items-center mb-12 max-w-2xl mx-auto px-4">
-        <div className="absolute top-1/2 left-0 w-full h-[2px] bg-surface-container-highest -translate-y-1/2 z-0"></div>
+        <div className="absolute top-5 left-0 w-full h-[2px] bg-surface-container-highest -translate-y-1/2 z-0"></div>
         <div 
-          className="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-300"
+          className="absolute top-5 left-0 h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-300"
           style={{ width: step === 1 ? '0%' : step === 2 ? '50%' : '100%' }}
         />
-        
+
         <button 
           onClick={() => setStep(1)} 
           className="relative z-10 flex flex-col items-center gap-2 group focus:outline-none"
@@ -129,7 +138,7 @@ export default function RFQContainer() {
       </div>
 
       <div className="grid grid-cols-12 gap-stack-gap">
-        {/* Left Column: Basic Info */}
+
         <div className="col-span-12 lg:col-span-5 space-y-6">
           <div className="bg-surface-container p-6 rounded-xl border border-outline-variant/30 backdrop-blur-sm relative">
             <h3 className="text-title-sm font-headline-md mb-6 flex items-center gap-2">
@@ -154,10 +163,17 @@ export default function RFQContainer() {
                     className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-body-md focus:border-primary outline-none text-on-surface"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
+                    required
                   >
-                    <option>Furniture</option>
-                    <option>IT Hardware</option>
-                    <option>Stationery</option>
+                    <option value="" disabled>Select Category</option>
+                    <option value="Furniture">Furniture</option>
+                    <option value="IT Hardware">IT Hardware</option>
+                    <option value="Software">Software</option>
+                    <option value="Stationery">Stationery</option>
+                    <option value="Logistics">Logistics</option>
+                    <option value="Construction">Construction</option>
+                    <option value="Consulting">Consulting</option>
+                    <option value="Raw Materials">Raw Materials</option>
                   </select>
                 </div>
                 <div>
@@ -200,9 +216,8 @@ export default function RFQContainer() {
           </div>
         </div>
 
-        {/* Right Column: Line Items & Vendors */}
         <div className="col-span-12 lg:col-span-7 space-y-6">
-          {/* Line Items Table */}
+
           <div className="bg-surface-container rounded-xl border border-outline-variant/30 overflow-hidden relative">
             <div className="p-6 border-b border-outline-variant/30 flex justify-between items-center">
               <h3 className="text-title-sm font-headline-md flex items-center gap-2">
@@ -217,7 +232,7 @@ export default function RFQContainer() {
                 Add line item
               </button>
             </div>
-            
+
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
@@ -256,7 +271,6 @@ export default function RFQContainer() {
             </div>
           </div>
 
-          {/* Assign Vendors & Dropzone */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-surface-container p-6 rounded-xl border border-outline-variant/30 relative">
               <div className="flex justify-between items-center mb-4">
@@ -289,7 +303,6 @@ export default function RFQContainer() {
               </div>
             </div>
 
-            {/* Dropzone Attachment */}
             <div className="relative bg-surface-container p-6 rounded-xl border border-dashed border-outline-variant flex flex-col items-center justify-center text-center group cursor-pointer hover:border-primary transition-colors">
               <input 
                 type="file" 
@@ -317,7 +330,6 @@ export default function RFQContainer() {
         </div>
       </div>
 
-      {/* Visual Decorative Elements */}
       <div className="fixed bottom-8 right-8 pointer-events-none opacity-20 hidden 2xl:block">
         <img 
           className="w-64 h-64 grayscale contrast-125" 

@@ -7,22 +7,14 @@ import Approvals from './Approvals';
 import DocumentViewer from './DocumentViewer';
 import Activity from './Activity';
 import Reports from './Reports';
-
-
-
-
-
-
-
-
+import { useDialog } from '../context/DialogContext';
 
 export default function Dashboard({ userRole, onLogout }) {
+  const { showAlert } = useDialog();
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [quotationView, setQuotationView] = useState('submit'); // 'submit' or 'compare'
 
-  
-  // Custom cursor-glow micro-interaction state
   const [glowStyle, setGlowStyle] = useState({});
 
   const handleMouseMove = (e) => {
@@ -56,7 +48,7 @@ export default function Dashboard({ userRole, onLogout }) {
       onMouseMove={handleMouseMove}
       style={glowStyle}
     >
-      {/* SIDEBAR */}
+
       <aside className="w-[260px] h-screen fixed left-0 top-0 bg-surface-container-low border-r border-outline-variant flex flex-col py-6 z-50">
         <div className="px-6 mb-10 flex flex-col gap-1">
           <span className="text-title-sm font-headline-md font-bold text-primary">VendorBridge</span>
@@ -107,9 +99,8 @@ export default function Dashboard({ userRole, onLogout }) {
         </div>
       </aside>
 
-      {/* RIGHT SIDE MAIN WRAPPER */}
       <div className="flex-1 ml-[260px] flex flex-col min-h-screen">
-        {/* TOP BAR */}
+
         <header className="h-16 border-b border-outline-variant flex justify-between items-center px-8 bg-surface z-40">
           <div className="flex items-center gap-4 flex-1">
             <div className="relative w-full max-w-md group focus-within:ring-1 focus-within:ring-primary rounded-lg transition-all">
@@ -123,30 +114,30 @@ export default function Dashboard({ userRole, onLogout }) {
               />
             </div>
           </div>
-          
+
           <div className="flex items-center gap-6">
             <button 
-              onClick={() => alert('Initiating new Request for Quotation (RFQ)...')}
+              onClick={() => setActiveTab('RFQs')}
               className="bg-primary hover:bg-primary/90 text-on-primary font-bold px-4 py-2 rounded-lg text-body-sm transition-all shadow-lg shadow-primary/10"
             >
               Create RFQ
             </button>
             <div className="flex items-center gap-4 text-on-surface-variant">
               <button 
-                onClick={() => alert('Notifications: All systems operational.')}
+                onClick={() => showAlert('Notifications: All systems operational.')}
                 className="hover:bg-surface-container-highest/50 p-2 rounded-lg transition-colors relative"
               >
                 <span className="material-symbols-outlined">notifications</span>
                 <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
               </button>
               <button 
-                onClick={() => alert('Settings Panel')}
+                onClick={() => showAlert('Settings Panel')}
                 className="hover:bg-surface-container-highest/50 p-2 rounded-lg transition-colors"
               >
                 <span className="material-symbols-outlined">settings</span>
               </button>
               <button 
-                onClick={() => alert('Help & Documentation')}
+                onClick={() => showAlert('Help & Documentation')}
                 className="hover:bg-surface-container-highest/50 p-2 rounded-lg transition-colors"
               >
                 <span className="material-symbols-outlined">help</span>
@@ -155,7 +146,6 @@ export default function Dashboard({ userRole, onLogout }) {
           </div>
         </header>
 
-        {/* MAIN CONTENT */}
         <main className="p-8 flex-grow overflow-y-auto max-w-[1440px] mx-auto w-full">
           <div className="mb-8">
             <h1 className="font-headline-md text-headline-md text-on-surface mb-1">{activeTab}</h1>
@@ -178,7 +168,7 @@ export default function Dashboard({ userRole, onLogout }) {
             </div>
           ) : activeTab === 'Dashboard' ? (
             <>
-              {/* KPI BENTO GRID */}
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group hover:border-primary/40 transition-all duration-300">
                   <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -208,7 +198,7 @@ export default function Dashboard({ userRole, onLogout }) {
                   </div>
                   <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Monthly Spend</span>
                   <div className="flex items-baseline gap-2">
-                    <span className="font-display-lg text-display-lg text-primary">$ 2.3L</span>
+                    <span className="font-display-lg text-display-lg text-primary">₹ 2.3L</span>
                     <span className="text-on-surface-variant text-[12px]">84% of budget</span>
                   </div>
                   <div className="mt-2 h-1 w-full bg-surface-container rounded-full overflow-hidden">
@@ -228,13 +218,12 @@ export default function Dashboard({ userRole, onLogout }) {
                 </div>
               </div>
 
-              {/* MAIN LAYOUT: TABLES & CHARTS */}
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                {/* Recent Purchase Orders */}
+
                 <div className="xl:col-span-2 glass-card rounded-xl overflow-hidden flex flex-col">
                   <div className="px-6 py-4 border-b border-outline-variant flex justify-between items-center">
                     <h2 class="font-title-sm text-title-sm text-on-surface">Recent Purchase Orders</h2>
-                    <a className="text-primary text-body-sm hover:underline" href="#" onClick={(e) => { e.preventDefault(); alert('Redirecting to full PO history...'); }}>View All</a>
+                    <a className="text-primary text-body-sm hover:underline" href="#" onClick={(e) => { e.preventDefault(); setActiveTab('Purchase Orders'); }}>View All</a>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left">
@@ -258,7 +247,6 @@ export default function Dashboard({ userRole, onLogout }) {
                   </div>
                 </div>
 
-                {/* Spending Trends Widget */}
                 <div className="glass-card rounded-xl overflow-hidden flex flex-col h-full">
                   <div className="px-6 py-4 border-b border-outline-variant">
                     <h2 className="font-title-sm text-title-sm text-on-surface">Spending Trends</h2>
@@ -266,7 +254,7 @@ export default function Dashboard({ userRole, onLogout }) {
                   </div>
                   <div className="p-6 flex-1 flex flex-col justify-center items-center">
                     <div className="relative w-48 h-48 mb-6">
-                      {/* Simulated Pie Chart with SVG */}
+
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                         <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#2d3449" strokeDasharray="100, 100" strokeWidth="4"></path>
                         <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#4edea3" strokeDasharray="65, 100" strokeWidth="4"></path>
@@ -277,53 +265,52 @@ export default function Dashboard({ userRole, onLogout }) {
                         <span className="text-label-caps font-label-caps text-on-surface-variant">LOGISTICS</span>
                       </div>
                     </div>
-                    
+
                     <div className="w-full space-y-3">
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
                           <span className="w-3 h-3 bg-primary rounded-full"></span>
                           <span className="text-body-sm text-on-surface">Logistics</span>
                         </div>
-                        <span className="text-body-sm font-bold">$ 1.2M</span>
+                        <span className="text-body-sm font-bold">₹ 1.2M</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
                           <span className="w-3 h-3 bg-secondary rounded-full"></span>
                           <span className="text-body-sm text-on-surface">IT Services</span>
                         </div>
-                        <span className="text-body-sm font-bold">$ 450K</span>
+                        <span className="text-body-sm font-bold">₹ 450K</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
                           <span className="w-3 h-3 bg-surface-container-highest rounded-full"></span>
                           <span className="text-body-sm text-on-surface">Other</span>
                         </div>
-                        <span className="text-body-sm font-bold">$ 650K</span>
+                        <span className="text-body-sm font-bold">₹ 650K</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* QUICK ACTIONS BAR */}
               <div className="mt-8 pt-8 border-t border-outline-variant flex flex-wrap gap-4 items-center">
                 <span className="text-label-caps font-label-caps text-on-surface-variant mr-4 uppercase">Quick Actions</span>
                 <button 
-                  onClick={() => alert('New RFQ creation flow')}
+                  onClick={() => setActiveTab('RFQs')}
                   className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-primary/40 hover:bg-primary/5 transition-all text-primary font-bold text-body-sm"
                 >
                   <span className="material-symbols-outlined text-[20px]">add</span>
                   New RFQ
                 </button>
                 <button 
-                  onClick={() => alert('Registering new vendor partner')}
+                  onClick={() => setActiveTab('Vendors')}
                   className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-outline-variant hover:bg-surface-container-high transition-all text-on-surface font-bold text-body-sm"
                 >
                   <span className="material-symbols-outlined text-[20px]">person_add</span>
                   Add Vendor
                 </button>
                 <button 
-                  onClick={() => alert('Opening invoice panel')}
+                  onClick={() => setActiveTab('Invoices')}
                   className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-outline-variant hover:bg-surface-container-high transition-all text-on-surface font-bold text-body-sm"
                 >
                   <span className="material-symbols-outlined text-[20px]">description</span>
@@ -332,23 +319,25 @@ export default function Dashboard({ userRole, onLogout }) {
               </div>
             </>
           ) : activeTab === 'Vendors' ? (
-            <VendorMgmt />
+            <VendorMgmt setActiveTab={setActiveTab} />
           ) : activeTab === 'RFQs' ? (
-            <RFQContainer />
+            <RFQContainer setActiveTab={setActiveTab} />
           ) : activeTab === 'Quotations' ? (
             quotationView === 'submit' ? (
-              <Quotations onBackToRFQs={() => setActiveTab('RFQs')} onCompare={() => setQuotationView('compare')} />
+              <Quotations onBackToRFQs={() => setActiveTab('RFQs')} onCompare={() => setQuotationView('compare')} setActiveTab={setActiveTab} />
             ) : (
-              <QuotationComparison onBack={() => setQuotationView('submit')} />
+              <QuotationComparison onBack={() => setQuotationView('submit')} setActiveTab={setActiveTab} />
             )
           ) : activeTab === 'Approvals' ? (
-            <Approvals />
-          ) : activeTab === 'Invoices' || activeTab === 'Purchase Orders' ? (
-            <DocumentViewer />
+            <Approvals setActiveTab={setActiveTab} />
+          ) : activeTab === 'Purchase Orders' ? (
+            <DocumentViewer setActiveTab={setActiveTab} documentType="PO" />
+          ) : activeTab === 'Invoices' ? (
+            <DocumentViewer setActiveTab={setActiveTab} documentType="Invoice" />
           ) : activeTab === 'Activity' ? (
-            <Activity />
+            <Activity setActiveTab={setActiveTab} />
           ) : activeTab === 'Reports' ? (
-            <Reports />
+            <Reports setActiveTab={setActiveTab} />
           ) : (
             <div className="glass-card p-12 rounded-xl text-center">
               <span className="material-symbols-outlined text-primary text-[64px] mb-4">construction</span>
@@ -356,7 +345,6 @@ export default function Dashboard({ userRole, onLogout }) {
               <p className="text-on-surface-variant">The {activeTab} workspace and details are coming soon.</p>
             </div>
           )}
-
 
         </main>
       </div>

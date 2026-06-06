@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useDialog } from '../context/DialogContext';
 
 export default function VendorMgmt() {
+  const { showAlert } = useDialog();
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
   const [vendors, setVendors] = useState([]);
@@ -42,12 +44,12 @@ export default function VendorMgmt() {
     e.preventDefault();
     const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i;
     if (!gstRegex.test(newVendor.gst)) {
-      alert("Invalid GST format. Must be 15 alphanumeric characters (e.g., 22AAAAA0000A1Z5).");
+      showAlert("Invalid GST format. Must be 15 alphanumeric characters (e.g., 22AAAAA0000A1Z5).");
       return;
     }
     const phoneRegex = /^[+0-9\s\-()]{10,20}$/;
     if (!phoneRegex.test(newVendor.contact)) {
-      alert("Invalid contact format.");
+      showAlert("Invalid contact format.");
       return;
     }
 
@@ -74,7 +76,7 @@ export default function VendorMgmt() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
+
       <div className="flex justify-between items-end">
         <div>
           <h2 className="font-headline-md text-headline-md text-on-surface">Vendors</h2>
@@ -89,7 +91,6 @@ export default function VendorMgmt() {
         </button>
       </div>
 
-      {/* Bento Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-surface-container p-4 rounded-xl border border-outline-variant/30 flex flex-col justify-between group hover:border-primary/50 transition-colors">
           <div className="flex justify-between items-start">
@@ -154,9 +155,8 @@ export default function VendorMgmt() {
         </div>
       </div>
 
-      {/* Table Section */}
       <div className="bg-surface-container rounded-xl border border-outline-variant overflow-hidden">
-        {/* Filters & Search Bar */}
+
         <div className="px-6 py-4 bg-surface-container-high/50 flex flex-wrap items-center justify-between gap-4 border-b border-outline-variant">
           <div className="flex flex-wrap items-center gap-2">
             {['All', 'Active', 'Pending', 'Blocked'].map((type) => {
@@ -179,7 +179,7 @@ export default function VendorMgmt() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Inline search bar for convenience */}
+
             <div className="relative">
               <input
                 type="text"
@@ -190,8 +190,8 @@ export default function VendorMgmt() {
               />
             </div>
             <button 
-              onClick={() => alert('Exporting Vendor List to CSV...')}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-highest border border-outline-variant text-body-sm text-on-surface-variant hover:text-on-surface transition-all"
+              onClick={() => showAlert('Exporting Vendor List to CSV...')}
+              className="flex items-center gap-2 px-4 py-2 border border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors rounded text-body-sm font-bold"
             >
               <span className="material-symbols-outlined text-[18px]">download</span>
               Export
@@ -199,7 +199,6 @@ export default function VendorMgmt() {
           </div>
         </div>
 
-        {/* Main Data Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -218,7 +217,7 @@ export default function VendorMgmt() {
                   vendor.status === 'Active' ? 'bg-primary/10 text-primary border-primary/20' :
                   vendor.status === 'Blocked' ? 'bg-error-container/20 text-error border-error/20' :
                   'bg-on-surface-variant/10 text-on-surface-variant border-outline-variant/30';
-                
+
                 const dotColor = 
                   vendor.status === 'Active' ? 'bg-primary' :
                   vendor.status === 'Blocked' ? 'bg-error' :
@@ -256,10 +255,11 @@ export default function VendorMgmt() {
                     </td>
                     <td className="px-cell-padding-h py-cell-padding-v text-right">
                       <button 
-                        onClick={() => alert(`Supplier Profile Details:\nName: ${vendor.name}\nCategory: ${vendor.category}\nGST No: ${vendor.gst}\nContact: ${vendor.contact}\nStatus: ${vendor.status}`)}
-                        className="text-primary hover:bg-primary/10 px-4 py-1.5 rounded font-bold text-[12px] transition-all"
+                        onClick={() => showAlert(`Supplier Profile Details:\nName: ${vendor.name}\nCategory: ${vendor.category}\nGST No: ${vendor.gst}\nContact: ${vendor.contact}\nStatus: ${vendor.status}`)}
+                        className="text-primary hover:bg-primary/10 p-2 rounded transition-colors"
+                        title="View Full Profile"
                       >
-                        View
+                        <span className="material-symbols-outlined">visibility</span>
                       </button>
                     </td>
                   </tr>
@@ -276,7 +276,6 @@ export default function VendorMgmt() {
           </table>
         </div>
 
-        {/* Pagination */}
         <div className="px-6 py-4 flex items-center justify-between bg-surface-container-low/30">
           <p className="text-[12px] text-on-surface-variant">Showing 1 to {filteredVendors.length} of {filteredVendors.length} vendors</p>
           <div className="flex gap-2">
@@ -293,7 +292,6 @@ export default function VendorMgmt() {
         </div>
       </div>
 
-      {/* Contextual Insight Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-surface-container-high/40 p-6 rounded-2xl border border-outline-variant backdrop-blur-md relative overflow-hidden group">
           <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors"></div>
@@ -329,13 +327,12 @@ export default function VendorMgmt() {
           </div>
           <p className="text-body-md text-on-surface mb-4">Insurance documentation for 'FastLog Transport' and 2 others will expire in the next 15 days.</p>
           <div className="flex gap-2">
-            <button onClick={() => alert('Sending notification email to compliant contacts...')} className="flex-1 bg-error-container/20 text-error py-2 rounded font-bold text-[12px] hover:bg-error-container/40 transition-all">Send Notifications</button>
-            <button onClick={() => alert('Opening Compliance Document Vault...')} className="flex-1 bg-surface-container-highest border border-outline-variant text-on-surface py-2 rounded font-bold text-[12px] hover:bg-surface-container-low transition-all">Review Docs</button>
+            <button onClick={() => showAlert('Sending notification email to compliant contacts...')} className="flex-1 bg-error-container/20 text-error py-2 rounded font-bold text-[12px] hover:bg-error-container/40 transition-all">Send Notifications</button>
+            <button onClick={() => showAlert('Opening Compliance Document Vault...')} className="flex-1 bg-surface-container-highest border border-outline-variant text-on-surface py-2 rounded font-bold text-[12px] hover:bg-surface-container-low transition-all">Review Docs</button>
           </div>
         </div>
       </div>
-      
-      {/* Floating Action Button */}
+
       <div className="fixed bottom-8 right-8 z-50">
         <button 
           onClick={() => setIsModalOpen(true)}
@@ -346,7 +343,6 @@ export default function VendorMgmt() {
         </button>
       </div>
 
-      {/* Add Vendor Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
           <div className="bg-surface p-8 rounded-xl w-full max-w-md border border-outline-variant shadow-2xl animate-in zoom-in-95">

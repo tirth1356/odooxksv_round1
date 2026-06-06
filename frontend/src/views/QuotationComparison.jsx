@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useDialog } from '../context/DialogContext';
 
 export default function QuotationComparison({ onBack }) {
+  const { showAlert } = useDialog();
   const [selectedVendor, setSelectedVendor] = useState('Infra Supplies');
 
   const criteria = [
-    { label: 'Grand Total (USD)', icon: 'payments', key: 'total' },
+    { label: 'Grand Total (INR)', icon: 'payments', key: 'total' },
     { label: 'GST (%)', icon: 'account_balance', key: 'gst' },
     { label: 'Delivery (Days)', icon: 'local_shipping', key: 'delivery' },
     { label: 'Vendor Rating', icon: 'verified', key: 'rating' },
@@ -16,19 +18,19 @@ export default function QuotationComparison({ onBack }) {
 
   const handleApprove = (vendorName) => {
     setSelectedVendor(vendorName);
-    alert(`${vendorName} has been selected and approved for Office Furniture procurement Q2!`);
+    showAlert(`${vendorName} has been selected and approved for Office Furniture procurement Q2!`);
   };
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
+
       <div className="max-w-container-max mx-auto">
         <nav className="flex items-center gap-2 text-on-surface-variant text-label-caps font-label-caps mb-4">
           <button onClick={onBack} className="hover:text-primary transition-colors">QUOTATIONS</button>
           <span className="material-symbols-outlined text-[14px]">chevron_right</span>
           <span className="text-primary font-bold">COMPARISON</span>
         </nav>
-        
+
         <div className="flex justify-between items-end">
           <div>
             <h2 className="font-display-lg text-display-lg text-on-surface">Quotation Comparison</h2>
@@ -41,14 +43,14 @@ export default function QuotationComparison({ onBack }) {
           </div>
           <div className="flex gap-3">
             <button 
-              onClick={() => alert('Exporting Comparison to PDF...')} 
+              onClick={() => showAlert('Exporting Comparison to PDF...')} 
               className="flex items-center gap-2 px-4 py-2 border border-outline-variant rounded-lg text-body-sm text-on-surface hover:bg-surface-container-high transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">download</span>
               Export PDF
             </button>
             <button 
-              onClick={() => alert('Opening Share Dialog...')} 
+              onClick={() => showAlert('Opening Share Dialog...')} 
               className="flex items-center gap-2 px-4 py-2 border border-outline-variant rounded-lg text-body-sm text-on-surface hover:bg-surface-container-high transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">share</span>
@@ -58,7 +60,6 @@ export default function QuotationComparison({ onBack }) {
         </div>
       </div>
 
-      {/* Comparison Table (Bento Grid Inspired Layout) */}
       {vendors.length === 0 ? (
         <div className="max-w-container-max mx-auto p-12 text-center bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl text-on-surface-variant">
           No quotations available for comparison yet.
@@ -67,11 +68,11 @@ export default function QuotationComparison({ onBack }) {
       <>
       <div className="max-w-container-max mx-auto">
         <div className="grid grid-cols-4 gap-0 border border-outline-variant rounded-xl overflow-hidden bg-surface-container-low shadow-2xl">
-          {/* Row 1: Header / Labels */}
+
           <div className="bg-surface-container-high/50 p-6 border-b border-r border-outline-variant flex items-center">
             <span className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Comparison Criteria</span>
           </div>
-          
+
           {vendors.map(v => {
             const isHighlighted = selectedVendor === v.name;
             return (
@@ -94,11 +95,10 @@ export default function QuotationComparison({ onBack }) {
             );
           })}
 
-          {/* Row 2: Grand Total */}
           <div className="p-cell-padding-v px-cell-padding-h border-b border-r border-outline-variant flex items-center text-on-surface-variant bg-surface-container-lowest/30">
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-primary text-[20px]">payments</span>
-              <span className="font-body-md">Grand Total (USD)</span>
+              <span className="font-body-md">Grand Total (INR)</span>
             </div>
           </div>
           {vendors.map(v => {
@@ -115,7 +115,6 @@ export default function QuotationComparison({ onBack }) {
             );
           })}
 
-          {/* Row 3: GST */}
           <div className="p-cell-padding-v px-cell-padding-h border-b border-r border-outline-variant flex items-center text-on-surface-variant bg-surface-container-lowest/30">
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-[20px]">account_balance</span>
@@ -136,7 +135,6 @@ export default function QuotationComparison({ onBack }) {
             );
           })}
 
-          {/* Row 4: Delivery */}
           <div className="p-cell-padding-v px-cell-padding-h border-b border-r border-outline-variant flex items-center text-on-surface-variant bg-surface-container-lowest/30">
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-[20px]">local_shipping</span>
@@ -164,7 +162,6 @@ export default function QuotationComparison({ onBack }) {
             );
           })}
 
-          {/* Row 5: Vendor Rating */}
           <div className="p-cell-padding-v px-cell-padding-h border-b border-r border-outline-variant flex items-center text-on-surface-variant bg-surface-container-lowest/30">
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-[20px]">verified</span>
@@ -188,7 +185,6 @@ export default function QuotationComparison({ onBack }) {
             );
           })}
 
-          {/* Row 6: Payment Terms */}
           <div className="p-cell-padding-v px-cell-padding-h border-b border-r border-outline-variant flex items-center text-on-surface-variant bg-surface-container-lowest/30">
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-[20px]">calendar_today</span>
@@ -209,7 +205,6 @@ export default function QuotationComparison({ onBack }) {
             );
           })}
 
-          {/* Row 7: Compliance */}
           <div className="p-cell-padding-v px-cell-padding-h border-b border-r border-outline-variant flex items-center text-on-surface-variant bg-surface-container-lowest/30">
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-[20px]">settings_suggest</span>
@@ -234,9 +229,8 @@ export default function QuotationComparison({ onBack }) {
             );
           })}
 
-          {/* Row 8: Action Buttons */}
           <div className="p-6 border-r border-outline-variant bg-surface-container-lowest/30">
-            {/* Spacer for criteria label column */}
+
           </div>
           {vendors.map(v => {
             const isHighlighted = selectedVendor === v.name;
@@ -265,7 +259,6 @@ export default function QuotationComparison({ onBack }) {
           })}
         </div>
 
-        {/* Footer Legend */}
         <div className="mt-6 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
@@ -281,7 +274,6 @@ export default function QuotationComparison({ onBack }) {
         </div>
       </div>
 
-      {/* Vendor Profile Preview Cards */}
       <div className="max-w-container-max mx-auto mt-12 grid grid-cols-3 gap-6">
         {vendors.map(v => {
           const isHighlighted = selectedVendor === v.name;

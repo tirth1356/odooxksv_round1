@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import Dashboard from './views/Dashboard';
+import { useDialog } from './context/DialogContext';
 import './App.css';
 
-function App() {
+export default function App() {
+  const { showAlert } = useDialog();
   const [screen, setScreen] = useState('login'); // 'login', 'register', or 'dashboard'
-  
+
   const [userRole, setUserRole] = useState(null);
 
-  // Login State
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
-  // Registration State
   const [regFirstName, setRegFirstName] = useState('');
   const [regLastName, setRegLastName] = useState('');
   const [regEmail, setRegEmail] = useState('');
@@ -61,10 +61,10 @@ function App() {
     setAuthError('');
     setAuthSuccess('');
     if (!regTerms) {
-      alert('You must agree to the Terms of Service and Data Privacy Policy.');
+      showAlert('You must agree to the Terms of Service and Data Privacy Policy.');
       return;
     }
-    
+
     try {
       const res = await fetch('http://localhost:8000/api/auth/register/', {
         method: 'POST',
@@ -99,14 +99,14 @@ function App() {
 
   return (
     <div className="bg-background text-on-surface font-body-md min-h-screen overflow-x-hidden selection:bg-primary/30 relative flex flex-col justify-between">
-      {/* Auth Background Elements */}
+
       <div className="fixed inset-0 z-0 pointer-events-none opacity-40 overflow-hidden auth-bg">
         <div className="absolute top-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-primary/10 rounded-full blur-[120px] float-anim"></div>
         <div className="absolute bottom-[-20%] left-[-10%] w-[50vw] h-[50vw] bg-secondary-container/20 rounded-full blur-[150px]"></div>
       </div>
 
       <main className="relative z-10 flex-grow flex flex-col items-center justify-center p-gutter">
-        {/* Login Screen (Screen 1) */}
+
         {screen === 'login' && (
           <section className="w-full max-w-[440px] transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex flex-col items-center mb-8">
@@ -120,7 +120,7 @@ function App() {
             <div className="glass-surface p-8 rounded-xl shadow-2xl relative overflow-hidden transition-all duration-300">
               <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
               <h2 className="font-headline-md text-headline-md mb-6">Portal Access</h2>
-              
+
               <form className="space-y-5" onSubmit={handleLoginSubmit}>
                 <div className="space-y-2 group">
                   <label className="font-label-caps text-label-caps text-on-surface-variant group-focus-within:text-primary transition-colors" htmlFor="login-email">Corporate Email</label>
@@ -141,7 +141,7 @@ function App() {
                 <div className="space-y-2 group">
                   <div className="flex justify-between items-center">
                     <label className="font-label-caps text-label-caps text-on-surface-variant group-focus-within:text-primary transition-colors" htmlFor="login-password">Access Key</label>
-                    <a className="font-body-sm text-body-sm text-primary hover:underline decoration-primary/30" href="#" onClick={(e) => { e.preventDefault(); alert('Reset link sent to your corporate email.'); }}>Forgot?</a>
+                    <a className="font-body-sm text-body-sm text-primary hover:underline decoration-primary/30" href="#" onClick={(e) => { e.preventDefault(); showAlert('Reset link sent to your corporate email.'); }}>Forgot?</a>
                   </div>
                   <div className="relative input-focus-glow">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant">lock_open</span>
@@ -180,11 +180,9 @@ function App() {
               </div>
             </div>
 
-
           </section>
         )}
 
-        {/* Registration Screen (Screen 2) */}
         {screen === 'register' && (
           <section className="w-full max-w-[720px] transition-all duration-500 animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between mb-8">
@@ -206,7 +204,7 @@ function App() {
             </div>
 
             <div className="glass-surface p-8 rounded-xl shadow-2xl">
-              {/* Registration Stepper */}
+
               <div className="flex items-center justify-between mb-10 px-8 relative">
                 <div className="absolute top-1/2 left-0 w-full h-[2px] bg-surface-container-highest -translate-y-1/2 z-0"></div>
                 <div className="absolute top-1/2 left-0 w-1/3 h-[2px] bg-primary -translate-y-1/2 z-0"></div>
@@ -223,7 +221,7 @@ function App() {
 
               <form onSubmit={handleRegisterSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {/* Photo Column */}
+
                   <div className="flex flex-col items-center md:items-start">
                     <label className="font-label-caps text-label-caps text-on-surface-variant mb-4 self-center">Profile Identity</label>
                     <div className="relative group cursor-pointer w-32 h-32 md:w-40 md:h-40 mx-auto">
@@ -245,7 +243,6 @@ function App() {
                     <p className="font-body-sm text-body-sm text-center text-on-surface-variant mt-4 px-4">Accepts JPG, PNG. Max 5MB.</p>
                   </div>
 
-                  {/* Fields Column */}
                   <div className="md:col-span-2 space-y-6">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -364,10 +361,10 @@ function App() {
                       onChange={(e) => setRegTerms(e.target.checked)}
                     />
                     <label className="font-body-sm text-body-sm text-on-surface-variant" htmlFor="terms">
-                      I agree to the <a className="text-primary hover:underline" href="#" onClick={(e) => { e.preventDefault(); alert('Enterprise Terms of Service agreement details.'); }}>Enterprise Terms of Service</a> and <a className="text-primary hover:underline" href="#" onClick={(e) => { e.preventDefault(); alert('Data Privacy Policy details.'); }}>Data Privacy Policy</a>.
+                      I agree to the <a className="text-primary hover:underline" href="#" onClick={(e) => { e.preventDefault(); showAlert('Enterprise Terms of Service agreement details.'); }}>Enterprise Terms of Service</a> and <a className="text-primary hover:underline" href="#" onClick={(e) => { e.preventDefault(); showAlert('Data Privacy Policy details.'); }}>Data Privacy Policy</a>.
                     </label>
                   </div>
-                  
+
                   <div className="flex gap-4 w-full md:w-auto">
                     <button
                       type="button"
@@ -399,4 +396,4 @@ function App() {
   );
 }
 
-export default App;
+

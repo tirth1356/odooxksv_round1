@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useDialog } from '../context/DialogContext';
 
-export default function Activity() {
+export default function Activity({ setActiveTab }) {
+  const { showAlert } = useDialog();
   const [filter, setFilter] = useState('All');
   const [alerts, setAlerts] = useState([]);
   const [toast, setToast] = useState(null);
@@ -9,15 +11,13 @@ export default function Activity() {
 
   const [logs, setLogs] = useState(initialLogs);
 
-  // Simulation of incoming real-time activity log
   useEffect(() => {
     const timer = setTimeout(() => {
       setToast({
         title: 'New Activity Logged',
         desc: 'Quotation submission by VendorBridge Partner.'
       });
-      
-      // Add a new log to the list
+
       const newLog = {
         id: Date.now(),
         title: 'Quotation Submission',
@@ -27,7 +27,6 @@ export default function Activity() {
       };
       setLogs(prev => [newLog, ...prev]);
 
-      // Hide toast after 5s
       setTimeout(() => setToast(null), 5000);
     }, 4000);
 
@@ -39,19 +38,19 @@ export default function Activity() {
   };
 
   const handleExportCSV = () => {
-    alert('Exporting immutable audit trail to CSV file...');
+    showAlert('Exporting immutable audit trail to CSV file...');
   };
 
   const filteredLogs = logs.filter(log => {
     if (filter === 'All') return true;
-    // Map tag filters
+
     if (filter === 'RFQs') return log.category === 'RFQs' || log.category === 'Quotations';
     return log.category === filter;
   });
 
   return (
     <div className="space-y-6 relative">
-      {/* Header Section */}
+
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <nav className="flex items-center gap-2 text-[10px] font-label-caps text-on-surface-variant mb-2">
@@ -62,7 +61,7 @@ export default function Activity() {
           <h2 className="font-display-lg text-display-lg text-on-surface">Procurement Audit Trail</h2>
           <p className="text-on-surface-variant mt-1 font-body-md">Real-time immutable history of all platform operations and decisions.</p>
         </div>
-        
+
         <div className="flex items-center gap-2 bg-surface-container border border-outline-variant p-1.5 rounded-xl flex-wrap">
           {['All', 'RFQs', 'Approvals', 'Invoices', 'Vendors'].map((tab) => {
             const isActive = filter === tab;
@@ -83,7 +82,6 @@ export default function Activity() {
         </div>
       </div>
 
-      {/* Dashboard Widgets for Activity Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="glass-card p-5 rounded-2xl">
           <div className="flex justify-between items-start mb-4">
@@ -128,11 +126,10 @@ export default function Activity() {
         </div>
       </div>
 
-      {/* Main Timeline & Filters Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Timeline Column */}
+
         <div className="lg:col-span-8 flex flex-col gap-4 relative timeline-line">
-          {/* Day Divider */}
+
           <div className="flex items-center gap-4 mb-2">
             <span className="text-label-caps text-[12px] text-primary bg-primary/10 px-3 py-1 rounded-full whitespace-nowrap">Today — May 23, 2025</span>
             <div className="h-px bg-outline-variant flex-1 opacity-30"></div>
@@ -153,7 +150,7 @@ export default function Activity() {
                     <span className="material-symbols-outlined text-xl">{catIcon}</span>
                   </div>
                 </div>
-                
+
                 <div className="flex-1 glass-card p-5 rounded-2xl group-hover:border-primary/30 transition-all">
                   <div className="flex justify-between items-start mb-2">
                     <div>
@@ -172,7 +169,7 @@ export default function Activity() {
                           <p className="text-body-sm font-medium text-on-surface">{log.doc.name}</p>
                         </div>
                       </div>
-                      <button onClick={() => alert(`Reviewing Details for ${log.title}...`)} className="px-4 py-2 bg-surface-container-highest/50 hover:bg-primary/20 hover:text-primary rounded-lg text-body-sm font-bold transition-all border border-outline-variant text-on-surface">
+                      <button onClick={() => setActiveTab('Purchase Orders')} className="px-4 py-2 bg-surface-container-highest/50 hover:bg-primary/20 hover:text-primary rounded-lg text-body-sm font-bold transition-all border border-outline-variant text-on-surface">
                         View Details
                       </button>
                     </div>
@@ -205,9 +202,8 @@ export default function Activity() {
           )}
         </div>
 
-        {/* Side Panels */}
         <div className="lg:col-span-4 flex flex-col gap-6 sticky top-24">
-          {/* Recent Notifications Card */}
+
           <div className="glass-card p-6 rounded-2xl">
             <div className="flex justify-between items-center mb-6">
               <h4 className="font-title-sm text-title-sm text-on-surface">Active Alerts</h4>
@@ -217,7 +213,7 @@ export default function Activity() {
                 </span>
               )}
             </div>
-            
+
             <div className="space-y-4">
               {alerts.map(a => {
                 let alertColor = 'text-error bg-error-container/20';
@@ -258,7 +254,6 @@ export default function Activity() {
             )}
           </div>
 
-          {/* Audit Log Integrity Card */}
           <div className="glass-card p-6 rounded-2xl bg-gradient-to-br from-surface-container-high/50 to-primary/5 border-primary/20 border">
             <div className="flex items-center gap-3 mb-4">
               <span className="material-symbols-outlined text-primary">verified_user</span>
@@ -273,7 +268,6 @@ export default function Activity() {
             </div>
           </div>
 
-          {/* Visual Asset / Chart Placeholder */}
           <div className="rounded-2xl overflow-hidden glass-card h-48 relative border border-outline-variant/30">
             <img 
               className="w-full h-full object-cover grayscale brightness-50 contrast-125 opacity-40" 
@@ -288,7 +282,6 @@ export default function Activity() {
         </div>
       </div>
 
-      {/* Floating Action Button */}
       <button 
         onClick={handleExportCSV}
         className="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-[0_8px_32px_rgba(16,185,129,0.3)] flex items-center justify-center hover:scale-110 transition-transform active:scale-95 group z-50"
@@ -299,7 +292,6 @@ export default function Activity() {
         </div>
       </button>
 
-      {/* Real-time Simulated Notification Toast */}
       {toast && (
         <div className="fixed bottom-24 left-[280px] bg-primary-container text-on-primary-container p-4 rounded-xl shadow-2xl flex items-center gap-4 animate-bounce z-50 border border-primary">
           <span className="material-symbols-outlined animate-spin">sync</span>

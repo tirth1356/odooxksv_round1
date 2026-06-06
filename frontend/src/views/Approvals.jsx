@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useDialog } from '../context/DialogContext';
 
-export default function Approvals() {
+export default function Approvals({ setActiveTab }) {
+  const { showAlert } = useDialog();
   const [status, setStatus] = useState('L2 Pending'); // 'L2 Pending', 'Approved', 'Rejected'
   const [remarks, setRemarks] = useState('');
   const [approvalChain, setApprovalChain] = useState([]);
@@ -16,7 +18,7 @@ export default function Approvals() {
       }
       return person;
     }));
-    alert('Quotation L2 approved successfully! Forwarded to David Chen for final review.');
+    showAlert('Quotation L2 approved successfully! Forwarded to David Chen for final review.');
   };
 
   const handleReject = () => {
@@ -27,12 +29,12 @@ export default function Approvals() {
       }
       return person;
     }));
-    alert('Quotation has been rejected with comments: "' + remarks + '"');
+    showAlert('Quotation has been rejected with comments: "' + remarks + '"');
   };
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
+
       <section className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-outline-variant pb-6">
         <div>
           <div className="flex items-center gap-2 text-primary font-label-caps mb-1">
@@ -44,7 +46,7 @@ export default function Approvals() {
             RFQ: <span className="text-on-surface font-semibold">Office Furniture Q2</span> • Vendor: <span class="text-on-surface font-semibold">Infra Supplies</span> • Ref ID: <span class="text-on-surface font-semibold">185400</span>
           </p>
         </div>
-        
+
         <div className="flex items-center gap-2">
           {status === 'L2 Pending' && (
             <span className="px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full text-body-sm flex items-center gap-2">
@@ -67,17 +69,15 @@ export default function Approvals() {
         </div>
       </section>
 
-      {/* Progress Stepper */}
       <div className="glass-panel rounded-xl p-8">
         <div className="relative flex items-center justify-between">
-          {/* Line */}
+
           <div className="absolute top-5 left-0 w-full h-[2px] bg-surface-container-highest"></div>
           <div 
             className="absolute top-5 left-0 h-[2px] bg-primary transition-all duration-1000" 
             style={{ width: status === 'Approved' ? '100%' : '66%' }}
           ></div>
-          
-          {/* Steps */}
+
           <div className="relative flex flex-col items-center group">
             <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary z-10 shadow-[0_0_15px_rgba(78,222,163,0.3)]">
               <span className="material-symbols-outlined text-[20px]">check</span>
@@ -108,9 +108,8 @@ export default function Approvals() {
         </div>
       </div>
 
-      {/* Content Bento Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-        {/* Left: Approval Chain */}
+
         <div className="lg:col-span-5 space-y-gutter">
           <div className="glass-panel rounded-xl p-6 h-full flex flex-col justify-between">
             <div>
@@ -118,11 +117,11 @@ export default function Approvals() {
                 <span className="material-symbols-outlined text-[18px]">account_tree</span>
                 APPROVAL CHAIN
               </h3>
-              
+
               <div className="space-y-8 relative">
-                {/* Connector Line */}
+
                 <div className="absolute left-[19px] top-4 bottom-4 w-[1px] bg-outline-variant/30"></div>
-                
+
                 {approvalChain.length === 0 && (
                   <p className="text-on-surface-variant text-sm opacity-60">No approval chain configured.</p>
                 )}
@@ -157,7 +156,7 @@ export default function Approvals() {
                       <div className="flex-1 pb-4 border-b border-outline-variant/30 last:border-none">
                         <p className="font-bold text-body-md text-on-surface">{person.name}</p>
                         <p className="text-body-sm text-on-surface-variant">{person.role}</p>
-                        
+
                         {person.info && (
                           <div className="mt-2 flex flex-col gap-1">
                             <div className={`flex items-center gap-2 text-[12px] ${textColor}`}>
@@ -173,7 +172,6 @@ export default function Approvals() {
               </div>
             </div>
 
-            {/* Approval Remarks Input */}
             <div className="mt-10 pt-6 border-t border-outline-variant">
               <label className="font-label-caps text-on-surface-variant mb-3 block">APPROVAL REMARKS</label>
               <textarea
@@ -186,14 +184,13 @@ export default function Approvals() {
           </div>
         </div>
 
-        {/* Right: Quotation Summary */}
         <div className="lg:col-span-7 flex flex-col gap-gutter justify-between">
           <div className="glass-panel rounded-xl p-6 flex-grow">
             <h3 className="font-label-caps text-on-surface-variant mb-6 flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px]">summarize</span>
               QUOTATIONS SUMMARY
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
               <div className="space-y-6">
                 <div>
@@ -209,7 +206,7 @@ export default function Approvals() {
                   <p className="text-on-surface-variant text-body-sm mb-1 uppercase tracking-wider font-label-caps">Total Value</p>
                   <div className="flex items-baseline gap-1">
                     <p className="text-primary text-[28px] font-display-lg">1,85,400</p>
-                    <p className="text-on-surface-variant font-label-caps">USD</p>
+                    <p className="text-on-surface-variant font-label-caps">INR</p>
                   </div>
                 </div>
               </div>
@@ -236,7 +233,6 @@ export default function Approvals() {
               </div>
             </div>
 
-            {/* Mini Preview */}
             <div className="bg-surface-container-low/50 border border-outline-variant/30 rounded-lg p-4 flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center text-primary">
@@ -248,7 +244,7 @@ export default function Approvals() {
                 </div>
               </div>
               <button 
-                onClick={() => alert('Opening Detailed Document Viewer...')}
+                onClick={() => setActiveTab('Quotations')}
                 className="text-primary hover:bg-primary/10 px-3 py-1.5 rounded transition-colors text-body-sm font-semibold"
               >
                 View Detail
@@ -256,7 +252,6 @@ export default function Approvals() {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mt-6">
             <button 
               onClick={handleApprove}
