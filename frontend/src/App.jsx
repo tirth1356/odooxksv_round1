@@ -151,7 +151,7 @@ export default function App() {
   }
 
   return (
-    <div className=`bg-background text-on-surface font-body-md min-h-screen overflow-x-hidden selection:bg-primary/30 relative flex flex-col justify-between">
+    <div className="bg-background text-on-surface font-body-md min-h-screen overflow-x-hidden selection:bg-primary/30 relative flex flex-col justify-between">
 
       <div className="fixed inset-0 z-0 pointer-events-none opacity-40 overflow-hidden auth-bg">
         <div className="absolute top-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-primary/10 rounded-full blur-[120px] float-anim"></div>

@@ -71,7 +71,7 @@ export default function Approvals({ setActiveTab }) {
         setStatus(responseData.data.status);
         setRemarks(responseData.data.remarks || '');
         setApprovalChain(responseData.data.approval_chain || []);
-        showToast('Quotation has been rejected with comments: `' + remarks + '"');
+        showToast('Quotation has been rejected with comments: "' + remarks + '"');
       } else {
         showAlert('Error rejecting quotation.');
       }

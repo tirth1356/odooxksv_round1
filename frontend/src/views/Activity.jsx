@@ -63,7 +63,7 @@ export default function Activity({ setActiveTab }) {
     
     logs.forEach(log => {
       const row = [
-        ``${log.title.replace(/"/g, '""')}"`,
+        `"${log.title.replace(/"/g, '""')}"`,
         `"${log.desc.replace(/"/g, '""')}"`,
         `"${log.category.replace(/"/g, '""')}"`,
         `"${log.time.replace(/"/g, '""')}"`

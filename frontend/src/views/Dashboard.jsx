@@ -68,7 +68,7 @@ export default function Dashboard({ userRole, onLogout }) {
 
   return (
     <div 
-      className=`min-h-screen bg-background text-on-surface font-body-md relative overflow-hidden flex"
+      className="min-h-screen bg-background text-on-surface font-body-md relative overflow-hidden flex"
       onMouseMove={handleMouseMove}
       style={glowStyle}
     >

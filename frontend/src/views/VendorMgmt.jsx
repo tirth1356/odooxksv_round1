@@ -45,7 +45,7 @@ export default function VendorMgmt() {
     e.preventDefault();
     const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i;
     if (!gstRegex.test(newVendor.gst)) {
-      showAlert(`Invalid GST format. Must be 15 alphanumeric characters (e.g., 22AAAAA0000A1Z5).");
+      showAlert("Invalid GST format. Must be 15 alphanumeric characters (e.g., 22AAAAA0000A1Z5).");
       return;
     }
     const phoneRegex = /^[+0-9\s\-()]{10,20}$/;
@@ -87,7 +87,7 @@ export default function VendorMgmt() {
         setNewVendor({ name: '', category: 'Constructions', gst: '', contact: '', status: 'Active' });
       } else {
         const errorData = await res.json();
-        showAlert(`Error registering vendor: " + JSON.stringify(errorData));
+        showAlert("Error registering vendor: " + JSON.stringify(errorData));
       }
     } catch (err) {
       showAlert("Network error connecting to backend.");

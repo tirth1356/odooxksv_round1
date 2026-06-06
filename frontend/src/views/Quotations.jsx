@@ -117,7 +117,7 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
   };
 
   return (
-    <div className=`space-y-6">
+    <div className="space-y-6">
 
       <div className="mb-10 animate-in fade-in slide-in-from-top-4 duration-700 flex justify-between items-end">
         <div>

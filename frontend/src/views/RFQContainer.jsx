@@ -120,7 +120,7 @@ export default function RFQContainer({ setActiveTab }) {
   };
 
   return (
-    <div className=`space-y-6">
+    <div className="space-y-6">
 
       <header>
         <div className="flex items-center gap-2 text-on-surface-variant text-body-sm mb-2">
