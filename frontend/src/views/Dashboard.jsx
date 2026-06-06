@@ -7,6 +7,7 @@ import Approvals from './Approvals';
 import DocumentViewer from './DocumentViewer';
 import Activity from './Activity';
 import Reports from './Reports';
+import VendorRFQs from './VendorRFQs';
 import { useDialog } from '../context/DialogContext';
 import { API_BASE_URL } from '../config';
 
@@ -180,20 +181,60 @@ export default function Dashboard({ userRole, onLogout }) {
             </div>
           ) : activeTab === 'Dashboard' ? (
             <>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group hover:border-primary/40 transition-all duration-300">
-                  <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <span className="material-symbols-outlined text-[48px] text-primary">request_quote</span>
+              {userRole === 'Vendor' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  <div className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group hover:border-primary/40 transition-all duration-300">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <span className="material-symbols-outlined text-[48px] text-primary">inbox</span>
+                    </div>
+                    <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">RFQs Invited To</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display-lg text-display-lg text-on-surface">3</span>
+                      <span className="text-primary text-[12px] font-bold">1 New</span>
+                    </div>
                   </div>
-                  <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Active RFQs</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-display-lg text-display-lg text-on-surface">
-                      {dashboardData?.kpis?.active_rfqs ?? 12}
-                    </span>
-                    <span className="text-primary text-[12px] font-bold">+2 this week</span>
+                  <div className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group hover:border-primary/40 transition-all duration-300">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <span className="material-symbols-outlined text-[48px] text-primary">receipt_long</span>
+                    </div>
+                    <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Quotations Submitted</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display-lg text-display-lg text-on-surface">8</span>
+                    </div>
+                  </div>
+                  <div className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group border-primary/20 hover:border-primary/50 transition-all duration-300">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <span className="material-symbols-outlined text-[48px] text-primary">shopping_cart</span>
+                    </div>
+                    <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Active POs</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display-lg text-display-lg text-primary">2</span>
+                    </div>
+                  </div>
+                  <div className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group border-error-container/20 hover:border-error/50 transition-all duration-300">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <span className="material-symbols-outlined text-[48px] text-error">priority_high</span>
+                    </div>
+                    <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Unpaid Invoices</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display-lg text-display-lg text-error">1</span>
+                    </div>
                   </div>
                 </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  <div className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group hover:border-primary/40 transition-all duration-300">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <span className="material-symbols-outlined text-[48px] text-primary">request_quote</span>
+                    </div>
+                    <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Active RFQs</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display-lg text-display-lg text-on-surface">
+                        {dashboardData?.kpis?.active_rfqs ?? 12}
+                      </span>
+                      <span className="text-primary text-[12px] font-bold">+2 this week</span>
+                    </div>
+                  </div>
 
                 <div className="glass-card p-6 rounded-xl flex flex-col gap-2 relative overflow-hidden group hover:border-primary/40 transition-all duration-300">
                   <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -237,6 +278,7 @@ export default function Dashboard({ userRole, onLogout }) {
                   </div>
                 </div>
               </div>
+              )}
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
@@ -407,7 +449,7 @@ export default function Dashboard({ userRole, onLogout }) {
           ) : activeTab === 'Vendors' ? (
             <VendorMgmt setActiveTab={setActiveTab} />
           ) : activeTab === 'RFQs' ? (
-            <RFQContainer setActiveTab={setActiveTab} />
+            userRole === 'Vendor' ? <VendorRFQs setActiveTab={setActiveTab} /> : <RFQContainer setActiveTab={setActiveTab} />
           ) : activeTab === 'Quotations' ? (
             quotationView === 'submit' ? (
               <Quotations onBackToRFQs={() => setActiveTab('RFQs')} onCompare={() => setQuotationView('compare')} setActiveTab={setActiveTab} />
