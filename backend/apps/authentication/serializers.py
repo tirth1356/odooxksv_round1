@@ -39,16 +39,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             country=validated_data.get('country', ''),
             additional_information=validated_data.get('additional_information', '')
         )
-        if user.role == 'Vendor':
-            from apps.vendors.models import Vendor
-            Vendor.objects.create(
-                user=user,
-                vendor_name=f"{user.first_name} {user.last_name}".strip() or user.username,
-                category="Other",
-                gst_no="27AABCS1429Bz0",
-                contact_no=user.phone_number or "0000000000",
-                status="Active"
-            )
         return user
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
