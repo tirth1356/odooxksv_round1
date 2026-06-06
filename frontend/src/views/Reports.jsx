@@ -7,14 +7,33 @@ export default function Reports({ setActiveTab }) {
   const [tickerIndex, setTickerIndex] = useState(0);
   const [selectedRange, setSelectedRange] = useState('May 1, 2025 - May 31, 2025');
 
-  const categories = [];
+  const categories = [
+    { name: 'IT & Electronics', spend: 4.8, percentage: 38, color: 'bg-primary' },
+    { name: 'Furniture', spend: 3.5, percentage: 28, color: 'bg-secondary' },
+    { name: 'Logistics', spend: 2.4, percentage: 19, color: 'bg-tertiary' },
+    { name: 'General', spend: 1.7, percentage: 15, color: 'bg-surface-container-highest' },
+  ];
 
-  const topVendors = [];
+  const topVendors = [
+    { name: 'Infra Supplies Pvt Ltd', init: 'IS', pos: 24, spend: '₹ 4.8M', rating: '★ 4.9' },
+    { name: 'Techcore LTD', init: 'TC', pos: 12, spend: '₹ 3.5M', rating: '★ 4.6' },
+    { name: 'OfficeNeed Co', init: 'ON', pos: 8, spend: '₹ 1.8M', rating: '★ 4.2' },
+  ];
 
-  const monthlyTrend = [];
+  const monthlyTrend = [
+    { month: 'Jan', spend: '₹ 1.8M', height: 'h-16', active: false },
+    { month: 'Feb', spend: '₹ 2.4M', height: 'h-24', active: false },
+    { month: 'Mar', spend: '₹ 3.2M', height: 'h-32', active: false },
+    { month: 'Apr', spend: '₹ 2.8M', height: 'h-28', active: false },
+    { month: 'May', spend: '₹ 4.8M', height: 'h-44', active: true },
+    { month: 'Jun', spend: '₹ 5.2M', height: 'h-48', active: false },
+  ];
 
   const tickers = [
-    "No recent activity to display."
+    "Techcore LTD completed delivery for PO-2024-0065.",
+    "L2 approval pending for Office Furniture Q2 RFQ.",
+    "Compliance warning: FastLog Transport insurance expires in 15 days.",
+    "New quote submitted by OfficeNeed Co for RFQ Q2."
   ];
 
   useEffect(() => {

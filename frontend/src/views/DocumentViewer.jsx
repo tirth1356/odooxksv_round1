@@ -1,12 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDialog } from '../context/DialogContext';
 
 export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' }) {
+  const { showAlert } = useDialog();
   const isPO = documentType === 'PO';
   const [paymentStatus, setPaymentStatus] = useState('Pending Payment'); // 'Pending Payment', 'Paid', 'Cancelled'
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
-
+  const [docData, setDocData] = useState(null);
   const [timeline, setTimeline] = useState([]);
+
+  useEffect(() => {
+    const fetchDocData = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const endpoint = isPO 
+          ? 'http://localhost:8000/api/procurement/purchase-orders/'
+          : 'http://localhost:8000/api/procurement/invoices/';
+        const res = await fetch(endpoint, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setDocData(data);
+          setPaymentStatus(data.status);
+          setTimeline(data.timeline || []);
+        }
+      } catch (err) {
+        console.error('Error fetching document:', err);
+      }
+    };
+    fetchDocData();
+  }, [documentType]);
 
   const triggerToast = (message) => {
     setToastMessage(message);
@@ -16,34 +43,61 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
     }, 3000);
   };
 
-  const handleMarkAsPaid = () => {
+  const handleMarkAsPaid = async () => {
     if (paymentStatus === 'Paid') return;
-    setPaymentStatus('Paid');
-
-    const updatedTimeline = [
-      { id: 5, title: 'Paid by Alex Thompson', time: 'Just now', completed: true },
-      ...timeline.map(t => {
-        if (t.title === 'Awaiting Payment Confirmation') {
-          return { ...t, title: 'Payment Confirmed', time: 'Just now', completed: true };
-        }
-        return t;
-      })
-    ];
-    setTimeline(updatedTimeline);
-    triggerToast('Invoice marked as Paid successfully.');
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch('http://localhost:8000/api/procurement/invoices/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'pay' })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setDocData(data);
+        setPaymentStatus(data.status);
+        setTimeline(data.timeline || []);
+        triggerToast('Invoice marked as Paid successfully.');
+      } else {
+        showAlert('Error marking invoice as paid.');
+      }
+    } catch (err) {
+      showAlert('Network error connecting to backend.');
+    }
   };
 
-  const handleCancelPO = () => {
+  const handleCancelPO = async () => {
     if (paymentStatus === 'Cancelled') return;
-    setPaymentStatus('Cancelled');
-
-    const updatedTimeline = [
-      { id: 6, title: isPO ? 'PO Cancelled by Alex Thompson' : 'Invoice Cancelled by Alex Thompson', time: 'Just now', completed: true, isError: true },
-      ...timeline
-    ];
-    setTimeline(updatedTimeline);
-    triggerToast(isPO ? 'Purchase Order has been Cancelled.' : 'Invoice has been Cancelled.');
+    try {
+      const token = localStorage.getItem('access_token');
+      const endpoint = isPO 
+        ? 'http://localhost:8000/api/procurement/purchase-orders/'
+        : 'http://localhost:8000/api/procurement/invoices/';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'cancel' })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setDocData(data);
+        setPaymentStatus(data.status);
+        setTimeline(data.timeline || []);
+        triggerToast(isPO ? 'Purchase Order has been Cancelled.' : 'Invoice has been Cancelled.');
+      } else {
+        showAlert('Error cancelling document.');
+      }
+    } catch (err) {
+      showAlert('Network error connecting to backend.');
+    }
   };
+
 
   return (
     <div className="space-y-6 relative">
@@ -57,7 +111,7 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
               {isPO ? 'PURCHASE ORDERS' : 'INVOICES'}
             </span>
             <span>/</span>
-            <span className="text-primary">{isPO ? 'PO-2024-0068' : 'INV-2024-0091'}</span>
+            <span className="text-primary">{isPO ? (docData?.po_number || 'PO-2024-0068') : (docData?.invoice_number || 'INV-2024-0091')}</span>
           </nav>
           <h2 className="font-display-lg text-display-lg text-on-surface">
             {isPO ? 'Purchase Order Details' : 'Invoice Details'}
@@ -115,7 +169,7 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
               <div className="text-right space-y-4">
                 <div>
                   <h3 className="font-label-caps text-label-caps text-primary mb-1">{isPO ? 'PURCHASE ORDER' : 'INVOICE'}</h3>
-                  <p className="font-display-lg text-title-sm text-on-surface">{isPO ? '#PO-2024-0068' : '#INV-2024-0091'}</p>
+                  <p className="font-display-lg text-title-sm text-on-surface">{isPO ? `#${docData?.po_number || 'PO-2024-0068'}` : `#${docData?.invoice_number || 'INV-2024-0091'}`}</p>
                 </div>
                 <div className="space-y-1 text-on-surface-variant font-body-sm">
                   <p className="font-bold text-on-surface">Vendor:</p>
@@ -129,16 +183,16 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-6 border-y border-outline-variant mb-8 bg-surface-container/30 px-6 rounded-lg">
               <div>
                 <p className="font-label-caps text-[10px] text-on-surface-variant mb-1 uppercase">PO Date</p>
-                <p className="font-table-data text-body-md text-on-surface">22 May, 2025</p>
+                <p className="font-table-data text-body-md text-on-surface">{docData?.date || '22 May, 2025'}</p>
               </div>
               <div>
                 <p className="font-label-caps text-[10px] text-on-surface-variant mb-1 uppercase">{isPO ? 'Expected Delivery' : 'Invoice Date'}</p>
-                <p className="font-table-data text-body-md text-on-surface">{isPO ? '05 Jun, 2025' : '22 May, 2025'}</p>
+                <p className="font-table-data text-body-md text-on-surface">{isPO ? (docData?.delivery_date || '05 Jun, 2025') : (docData?.date || '22 May, 2025')}</p>
               </div>
               {!isPO && (
                 <div>
                   <p className="font-label-caps text-[10px] text-on-surface-variant mb-1 uppercase">Due Date</p>
-                  <p className="font-table-data text-body-md text-on-surface">21 June, 2025</p>
+                  <p className="font-table-data text-body-md text-on-surface">{docData?.due_date || '21 June, 2025'}</p>
                 </div>
               )}
               <div>
@@ -150,7 +204,7 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
                     'bg-orange-400'
                   }`}></span>
                   <p className="font-table-data text-body-md text-on-surface">
-                    {isPO ? (paymentStatus === 'Paid' ? 'Completed' : paymentStatus === 'Pending Payment' ? 'Issued' : 'Cancelled') : paymentStatus}
+                    {isPO ? (paymentStatus === 'Paid' ? 'Completed' : paymentStatus === 'Pending Payment' ? 'Issued' : paymentStatus === 'Issued' ? 'Issued' : paymentStatus) : paymentStatus}
                   </p>
                 </div>
               </div>
@@ -167,11 +221,22 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
                   </tr>
                 </thead>
                 <tbody className="text-on-surface font-table-data text-body-md">
-                  <tr>
-                    <td colSpan={4} className="py-8 px-4 text-center text-on-surface-variant opacity-60">
-                      No invoice items found.
-                    </td>
-                  </tr>
+                  {docData?.items && docData.items.length > 0 ? (
+                    docData.items.map((item, idx) => (
+                      <tr key={idx} className="border-b border-outline-variant/30 hover:bg-surface-container-high/30">
+                        <td className="py-cell-padding-v px-cell-padding-h">{item.desc}</td>
+                        <td className="py-cell-padding-v px-cell-padding-h text-right">{item.qty}</td>
+                        <td className="py-cell-padding-v px-cell-padding-h text-right">₹ {item.price.toLocaleString()}</td>
+                        <td className="py-cell-padding-v px-cell-padding-h text-right font-mono">₹ {item.total.toLocaleString()}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="py-8 px-4 text-center text-on-surface-variant opacity-60">
+                        No invoice items found.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -180,24 +245,25 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
               <div className="w-80 space-y-3 font-body-md">
                 <div className="flex justify-between text-on-surface-variant">
                   <span>Subtotal</span>
-                  <span className="text-on-surface font-mono">₹ 1,69,500</span>
+                  <span className="text-on-surface font-mono">{docData?.subtotal || '₹ 1,69,500'}</span>
                 </div>
                 {!isPO && (
                   <>
                     <div className="flex justify-between text-on-surface-variant">
                       <span>CGST (9%)</span>
-                      <span className="text-on-surface font-mono">₹ 15,255</span>
+                      <span className="text-on-surface font-mono">{docData?.cgst || '₹ 15,255'}</span>
                     </div>
                     <div className="flex justify-between text-on-surface-variant">
                       <span>SGST (9%)</span>
-                      <span className="text-on-surface font-mono">₹ 15,255</span>
+                      <span className="text-on-surface font-mono">{docData?.sgst || '₹ 15,255'}</span>
                     </div>
                   </>
                 )}
                 <div className="flex justify-between items-center py-3 border-t border-outline-variant mt-2">
                   <span className="font-bold text-title-sm text-on-surface">{isPO ? 'Total Value' : 'Grand Total'}</span>
-                  <span className="font-display-lg text-title-sm text-primary font-mono">{isPO ? '₹ 1,69,500' : '₹ 2,00,010'}</span>
+                  <span className="font-display-lg text-title-sm text-primary font-mono">{docData?.grand_total || '₹ 2,00,010'}</span>
                 </div>
+
                 {!isPO && (
                   <div className="text-[10px] text-right font-label-caps text-on-surface-variant mt-2 italic">
                     Amount in words: Two Lakhs and Ten Rupees Only.

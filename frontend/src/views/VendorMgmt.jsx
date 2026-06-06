@@ -40,7 +40,7 @@ export default function VendorMgmt() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newVendor, setNewVendor] = useState({ name: '', category: 'Constructions', gst: '', contact: '', status: 'Active' });
 
-  const handleAddVendorSubmit = (e) => {
+  const handleAddVendorSubmit = async (e) => {
     e.preventDefault();
     const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/i;
     if (!gstRegex.test(newVendor.gst)) {
@@ -53,17 +53,44 @@ export default function VendorMgmt() {
       return;
     }
 
-    const init = newVendor.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-
-    const vendorToAdd = {
-      id: vendors.length + 1,
-      init,
-      ...newVendor
-    };
-
-    setVendors([...vendors, vendorToAdd]);
-    setIsModalOpen(false);
-    setNewVendor({ name: '', category: 'Constructions', gst: '', contact: '', status: 'Active' });
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch('http://localhost:8000/api/vendors/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          vendor_name: newVendor.name,
+          category: newVendor.category,
+          gst_no: newVendor.gst,
+          contact_no: newVendor.contact,
+          status: newVendor.status
+        })
+      });
+      if (res.ok) {
+        const v = await res.json();
+        const init = v.vendor_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        const formatted = {
+          id: v.id,
+          init,
+          name: v.vendor_name,
+          category: v.category,
+          gst: v.gst_no,
+          contact: v.contact_no,
+          status: v.status
+        };
+        setVendors([...vendors, formatted]);
+        setIsModalOpen(false);
+        setNewVendor({ name: '', category: 'Constructions', gst: '', contact: '', status: 'Active' });
+      } else {
+        const errorData = await res.json();
+        showAlert("Error registering vendor: " + JSON.stringify(errorData));
+      }
+    } catch (err) {
+      showAlert("Network error connecting to backend.");
+    }
   };
 
   const filteredVendors = vendors.filter(vendor => {

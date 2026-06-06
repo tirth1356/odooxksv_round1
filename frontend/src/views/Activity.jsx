@@ -7,11 +7,27 @@ export default function Activity({ setActiveTab }) {
   const [alerts, setAlerts] = useState([]);
   const [toast, setToast] = useState(null);
 
-  const initialLogs = [];
-
-  const [logs, setLogs] = useState(initialLogs);
+  const [logs, setLogs] = useState([]);
 
   useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const res = await fetch('http://localhost:8000/api/procurement/activity-logs/', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setLogs(data);
+        }
+      } catch (err) {
+        console.error('Error fetching logs:', err);
+      }
+    };
+    fetchLogs();
+
     const timer = setTimeout(() => {
       setToast({
         title: 'New Activity Logged',

@@ -7,7 +7,10 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
   const [validity, setValidity] = useState('30 Days');
   const [paymentTerms, setPaymentTerms] = useState('Payment terms: 20 days net. Standard 1-year warranty included for all furniture items. Shipping included in the quoted price.');
 
-  const [lineItems, setLineItems] = useState([]);
+  const [lineItems, setLineItems] = useState([
+    { id: 1, desc: 'Ergonomic chair', icon: 'chair', qty: 25, unitPrice: 5500, deliveryDays: 10 },
+    { id: 2, desc: 'Standing desks', icon: 'desk', qty: 10, unitPrice: 3200, deliveryDays: 10 }
+  ]);
 
   const handleUnitPriceChange = (id, newPrice) => {
     setLineItems(lineItems.map(item => {

@@ -1,62 +1,38 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.permissions import AllowAny
+from django.db.models import Q
+from .models import Vendor
+from .serializers import VendorSerializer
 
 class MockVendorListView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        vendors = [
-            {
-                "id": 1,
-                "vendor_name": "Infra Supplies Pvt Ltd",
-                "category": "Construction",
-                "gst_no": "27AABCS1429Bz0",
-                "contact_no": "+91-98765-43210",
-                "status": "Active"
-            },
-            {
-                "id": 2,
-                "vendor_name": "Techcore LTD",
-                "category": "IT",
-                "gst_no": "27AABCS1429Bz0",
-                "contact_no": "+91-98765-43211",
-                "status": "Active"
-            },
-            {
-                "id": 3,
-                "vendor_name": "OfficeNeed Co",
-                "category": "Furniture",
-                "gst_no": "27AABCS1429Bz2",
-                "contact_no": "+91-98765-43212",
-                "status": "Pending"
-            },
-            {
-                "id": 4,
-                "vendor_name": "FastLog Transport",
-                "category": "logistics",
-                "gst_no": "27AABCS1429Bz0",
-                "contact_no": "+91-98765-43213",
-                "status": "Blocked"
-            }
-        ]
-
-        # Handle tab filtering
         status_filter = request.query_params.get('status', '').strip().lower()
+        vendors = Vendor.objects.all()
+        
         if status_filter:
             if status_filter == 'active':
-                vendors = [v for v in vendors if v['status'] == 'Active']
+                vendors = vendors.filter(status='Active')
             elif status_filter == 'pending':
-                vendors = [v for v in vendors if v['status'] == 'Pending']
+                vendors = vendors.filter(status='Pending')
             elif status_filter == 'blocked':
-                vendors = [v for v in vendors if v['status'] == 'Blocked']
+                vendors = vendors.filter(status='Blocked')
 
-        # Handle search parameter
-        search_query = request.query_params.get('search', '').strip().lower()
+        search_query = request.query_params.get('search', '').strip()
         if search_query:
-            vendors = [
-                v for v in vendors 
-                if search_query in v['vendor_name'].lower() or search_query in v['category'].lower()
-            ]
+            vendors = vendors.filter(
+                Q(vendor_name__icontains=search_query) | Q(category__icontains=search_query)
+            )
 
-        return Response(vendors)
+        serializer = VendorSerializer(vendors, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = VendorSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

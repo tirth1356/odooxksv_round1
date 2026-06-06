@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import VendorMgmt from './VendorMgmt';
 import RFQContainer from './RFQContainer';
 import Quotations from './Quotations';
@@ -14,8 +14,31 @@ export default function Dashboard({ userRole, onLogout }) {
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [quotationView, setQuotationView] = useState('submit'); // 'submit' or 'compare'
+  const [dashboardData, setDashboardData] = useState(null);
 
   const [glowStyle, setGlowStyle] = useState({});
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const res = await fetch('http://localhost:8000/api/dashboard/', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setDashboardData(data);
+        }
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err);
+      }
+    };
+    if (activeTab === 'Dashboard') {
+      fetchDashboardData();
+    }
+  }, [activeTab]);
 
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -176,7 +199,9 @@ export default function Dashboard({ userRole, onLogout }) {
                   </div>
                   <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Active RFQs</span>
                   <div className="flex items-baseline gap-2">
-                    <span className="font-display-lg text-display-lg text-on-surface">12</span>
+                    <span className="font-display-lg text-display-lg text-on-surface">
+                      {dashboardData?.kpis?.active_rfqs ?? 12}
+                    </span>
                     <span className="text-primary text-[12px] font-bold">+2 this week</span>
                   </div>
                 </div>
@@ -187,7 +212,9 @@ export default function Dashboard({ userRole, onLogout }) {
                   </div>
                   <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Pending Approvals</span>
                   <div className="flex items-baseline gap-2">
-                    <span className="font-display-lg text-display-lg text-on-surface">5</span>
+                    <span className="font-display-lg text-display-lg text-on-surface">
+                      {dashboardData?.kpis?.pending_approvals ?? 5}
+                    </span>
                     <span className="text-error text-[12px] font-bold">Priority: 2</span>
                   </div>
                 </div>
@@ -198,7 +225,9 @@ export default function Dashboard({ userRole, onLogout }) {
                   </div>
                   <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Monthly Spend</span>
                   <div className="flex items-baseline gap-2">
-                    <span className="font-display-lg text-display-lg text-primary">₹ 2.3L</span>
+                    <span className="font-display-lg text-display-lg text-primary">
+                      {dashboardData?.kpis ? `₹ ${dashboardData.kpis.pos_this_month}` : "₹ 2.3L"}
+                    </span>
                     <span className="text-on-surface-variant text-[12px]">84% of budget</span>
                   </div>
                   <div className="mt-2 h-1 w-full bg-surface-container rounded-full overflow-hidden">
@@ -212,7 +241,9 @@ export default function Dashboard({ userRole, onLogout }) {
                   </div>
                   <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">Overdue Invoices</span>
                   <div className="flex items-baseline gap-2">
-                    <span className="font-display-lg text-display-lg text-error">3</span>
+                    <span className="font-display-lg text-display-lg text-error">
+                      {dashboardData?.kpis?.overdue_invoices ?? 3}
+                    </span>
                     <span className="text-on-surface-variant text-[12px]">Avg 4 days late</span>
                   </div>
                 </div>
@@ -222,7 +253,7 @@ export default function Dashboard({ userRole, onLogout }) {
 
                 <div className="xl:col-span-2 glass-card rounded-xl overflow-hidden flex flex-col">
                   <div className="px-6 py-4 border-b border-outline-variant flex justify-between items-center">
-                    <h2 class="font-title-sm text-title-sm text-on-surface">Recent Purchase Orders</h2>
+                    <h2 className="font-title-sm text-title-sm text-on-surface">Recent Purchase Orders</h2>
                     <a className="text-primary text-body-sm hover:underline" href="#" onClick={(e) => { e.preventDefault(); setActiveTab('Purchase Orders'); }}>View All</a>
                   </div>
                   <div className="overflow-x-auto">
@@ -237,11 +268,40 @@ export default function Dashboard({ userRole, onLogout }) {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-outline-variant/30">
-                        <tr>
-                          <td colSpan={5} className="px-6 py-8 text-center text-on-surface-variant opacity-60">
-                            No recent purchase orders found.
-                          </td>
-                        </tr>
+                        {dashboardData?.recent_purchase_orders?.length > 0 ? (
+                          dashboardData.recent_purchase_orders.map((po) => {
+                            const statusColor = 
+                              po.status === 'Approved' ? 'bg-primary/10 text-primary border-primary/20' :
+                              po.status === 'Pending' ? 'bg-on-surface-variant/10 text-on-surface-variant border-outline-variant/30' :
+                              'bg-error-container/20 text-error border-error/20';
+                            return (
+                              <tr key={po.po_number} className="hover:bg-surface-container-high transition-colors">
+                                <td className="px-6 py-4 font-table-data text-on-surface font-bold">{po.po_number}</td>
+                                <td className="px-6 py-4 font-table-data text-on-surface-variant">{po.vendor}</td>
+                                <td className="px-6 py-4 font-table-data text-on-surface-variant font-mono">₹ {po.amount.toLocaleString()}</td>
+                                <td className="px-6 py-4">
+                                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${statusColor}`}>
+                                    {po.status}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <button 
+                                    onClick={() => showAlert(`Details for PO ${po.po_number}:\nVendor: ${po.vendor}\nAmount: ₹ ${po.amount}\nStatus: ${po.status}`)}
+                                    className="text-primary hover:underline text-body-sm font-semibold"
+                                  >
+                                    View
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        ) : (
+                          <tr>
+                            <td colSpan={5} className="px-6 py-8 text-center text-on-surface-variant opacity-60">
+                              No recent purchase orders found.
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>

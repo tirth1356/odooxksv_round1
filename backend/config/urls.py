@@ -16,9 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from apps.procurement.views import MockDashboardView
+from apps.procurement.views import (
+    MockDashboardView,
+    MockApprovalsView,
+    MockPOView,
+    MockInvoiceView,
+    MockActivityLogsView,
+)
 from apps.vendors.views import MockVendorListView
-from apps.rfqs.views import MockRFQView
+from apps.rfqs.views import MockRFQView, MockQuotationComparisonView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +32,10 @@ urlpatterns = [
     path('api/dashboard/', MockDashboardView.as_view(), name='mock_dashboard'),
     path('api/vendors/', MockVendorListView.as_view(), name='mock_vendors'),
     path('api/rfqs/', MockRFQView.as_view(), name='mock_rfqs'),
+    path('api/rfqs/compare/', MockQuotationComparisonView.as_view(), name='mock_rfq_compare'),
+    path('api/approvals/', MockApprovalsView.as_view(), name='mock_approvals'),
+    path('api/procurement/purchase-orders/', MockPOView.as_view(), name='mock_purchase_orders'),
+    path('api/procurement/invoices/', MockInvoiceView.as_view(), name='mock_invoices'),
+    path('api/procurement/activity-logs/', MockActivityLogsView.as_view(), name='mock_activity_logs'),
 ]
+

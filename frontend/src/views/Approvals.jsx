@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDialog } from '../context/DialogContext';
 
 export default function Approvals({ setActiveTab }) {
@@ -7,30 +7,78 @@ export default function Approvals({ setActiveTab }) {
   const [remarks, setRemarks] = useState('');
   const [approvalChain, setApprovalChain] = useState([]);
 
-  const handleApprove = () => {
-    setStatus('Approved');
-    setApprovalChain(approvalChain.map(person => {
-      if (person.name === 'Priya Shah') {
-        return { ...person, status: 'Approved', info: 'Approved just now' };
+  useEffect(() => {
+    const fetchApprovalData = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const res = await fetch('http://localhost:8000/api/approvals/', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setStatus(data.status);
+          setRemarks(data.remarks || '');
+          setApprovalChain(data.approval_chain || []);
+        }
+      } catch (err) {
+        console.error('Error fetching approvals:', err);
       }
-      if (person.name === 'David Chen') {
-        return { ...person, status: 'Awaiting', info: 'Assigned just now' };
+    };
+    fetchApprovalData();
+  }, []);
+
+  const handleApprove = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch('http://localhost:8000/api/approvals/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'approve', remarks })
+      });
+      if (res.ok) {
+        const responseData = await res.json();
+        setStatus(responseData.data.status);
+        setRemarks(responseData.data.remarks || '');
+        setApprovalChain(responseData.data.approval_chain || []);
+        showAlert('Quotation L2 approved successfully! Forwarded to David Chen for final review.');
+      } else {
+        showAlert('Error approving quotation.');
       }
-      return person;
-    }));
-    showAlert('Quotation L2 approved successfully! Forwarded to David Chen for final review.');
+    } catch (err) {
+      showAlert('Network error connecting to backend.');
+    }
   };
 
-  const handleReject = () => {
-    setStatus('Rejected');
-    setApprovalChain(approvalChain.map(person => {
-      if (person.name === 'Priya Shah') {
-        return { ...person, status: 'Rejected', info: 'Rejected just now' };
+  const handleReject = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch('http://localhost:8000/api/approvals/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'reject', remarks })
+      });
+      if (res.ok) {
+        const responseData = await res.json();
+        setStatus(responseData.data.status);
+        setRemarks(responseData.data.remarks || '');
+        setApprovalChain(responseData.data.approval_chain || []);
+        showAlert('Quotation has been rejected with comments: "' + remarks + '"');
+      } else {
+        showAlert('Error rejecting quotation.');
       }
-      return person;
-    }));
-    showAlert('Quotation has been rejected with comments: "' + remarks + '"');
+    } catch (err) {
+      showAlert('Network error connecting to backend.');
+    }
   };
+
 
   return (
     <div className="space-y-6">

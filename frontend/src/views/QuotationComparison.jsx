@@ -1,9 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDialog } from '../context/DialogContext';
 
 export default function QuotationComparison({ onBack }) {
   const { showAlert } = useDialog();
-  const [selectedVendor, setSelectedVendor] = useState('Infra Supplies');
+  const [selectedVendor, setSelectedVendor] = useState('Infra Supplies Pvt Ltd');
+  const [vendors, setVendors] = useState([]);
+
+  useEffect(() => {
+    const fetchComparisonData = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const res = await fetch('http://localhost:8000/api/rfqs/compare/', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setVendors(data);
+          if (data.length > 0) {
+            setSelectedVendor(data[0].name);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching comparison data:', err);
+      }
+    };
+    fetchComparisonData();
+  }, []);
 
   const criteria = [
     { label: 'Grand Total (INR)', icon: 'payments', key: 'total' },
@@ -13,8 +37,6 @@ export default function QuotationComparison({ onBack }) {
     { label: 'Payment Terms', icon: 'calendar_today', key: 'terms' },
     { label: 'Compliance', icon: 'settings_suggest', key: 'compliance' }
   ];
-
-  const vendors = [];
 
   const handleApprove = (vendorName) => {
     setSelectedVendor(vendorName);
