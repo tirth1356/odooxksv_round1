@@ -137,3 +137,31 @@ class MockAPITests(APITestCase):
         self.assertGreater(len(response.data), 0)
         self.assertEqual(response.data[0]['category'], 'Approvals')
 
+    def test_quotation_submission(self):
+        url = reverse('mock_quotations')
+        
+        # Test GET
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
+        
+        # Test POST
+        payload = {
+            "rfq_id": "99321",
+            "tax_rate": 18.0,
+            "validity": "30 Days",
+            "payment_terms": "Net 20",
+            "subtotal": 169500.0,
+            "gst_amount": 30510.0,
+            "grand_total": 200010.0,
+            "status": "Submitted",
+            "line_items": [
+                {"desc": "Ergonomic chair", "qty": 25, "unit_price": 5500.0, "delivery_days": 10},
+                {"desc": "Standing desks", "qty": 10, "unit_price": 3200.0, "delivery_days": 10}
+            ]
+        }
+        response = self.client.post(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['status'], 'Submitted')
+        self.assertEqual(len(response.data['line_items']), 2)
+

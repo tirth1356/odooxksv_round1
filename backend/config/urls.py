@@ -22,6 +22,7 @@ from apps.procurement.views import (
     MockPOView,
     MockInvoiceView,
     MockActivityLogsView,
+    QuotationSubmitView,
 )
 from apps.vendors.views import MockVendorListView
 from apps.rfqs.views import MockRFQView, MockQuotationComparisonView
@@ -37,5 +38,6 @@ urlpatterns = [
     path('api/procurement/purchase-orders/', MockPOView.as_view(), name='mock_purchase_orders'),
     path('api/procurement/invoices/', MockInvoiceView.as_view(), name='mock_invoices'),
     path('api/procurement/activity-logs/', MockActivityLogsView.as_view(), name='mock_activity_logs'),
+    path('api/procurement/quotations/', QuotationSubmitView.as_view(), name='mock_quotations'),
 ]
 

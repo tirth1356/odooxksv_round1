@@ -9,6 +9,8 @@ from .models import (
     InvoiceItem,
     InvoiceTimelineEvent,
     ActivityLog,
+    Quotation,
+    QuotationLineItem,
 )
 
 class ApprovalStepSerializer(serializers.ModelSerializer):
@@ -63,3 +65,22 @@ class ActivityLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityLog
         fields = ['id', 'title', 'desc', 'category', 'time']
+
+class QuotationLineItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuotationLineItem
+        fields = ['desc', 'qty', 'unit_price', 'delivery_days']
+
+class QuotationSerializer(serializers.ModelSerializer):
+    line_items = QuotationLineItemSerializer(many=True)
+
+    class Meta:
+        model = Quotation
+        fields = ['id', 'rfq_id', 'tax_rate', 'validity', 'payment_terms', 'subtotal', 'gst_amount', 'grand_total', 'status', 'line_items']
+
+    def create(self, validated_data):
+        line_items_data = validated_data.pop('line_items', [])
+        quotation = Quotation.objects.create(**validated_data)
+        for item_data in line_items_data:
+            QuotationLineItem.objects.create(quotation=quotation, **item_data)
+        return quotation

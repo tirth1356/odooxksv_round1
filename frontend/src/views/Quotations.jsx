@@ -66,23 +66,47 @@ export default function Quotations({ onBackToRFQs, onCompare }) {
   const gstAmount = subtotal * (taxRate / 100);
   const grandTotal = subtotal + gstAmount;
 
-  const handleSubmit = (isDraft) => {
+  const handleSubmit = async (isDraft) => {
     const quoteData = {
-      lineItems,
-      taxRate,
-      validity,
-      paymentTerms,
-      subtotal,
-      gstAmount,
-      grandTotal,
-      status: isDraft ? 'Draft' : 'Submitted'
+      rfq_id: "99321",
+      tax_rate: taxRate,
+      validity: validity,
+      payment_terms: paymentTerms,
+      subtotal: subtotal,
+      gst_amount: gstAmount,
+      grand_total: grandTotal,
+      status: isDraft ? 'Draft' : 'Submitted',
+      line_items: lineItems.map(item => ({
+        desc: item.desc,
+        qty: item.qty,
+        unit_price: item.unitPrice,
+        delivery_days: item.deliveryDays
+      }))
     };
-    console.log('Submitting Quotation:', quoteData);
-    showAlert(isDraft ? 'Quotation Draft Saved!' : 'Quotation Submitted Successfully!');
-    setLineItems([]);
-    setTaxRate(18);
-    setValidity('30 Days');
-    setPaymentTerms('Payment terms: 20 days net. Standard 1-year warranty included for all furniture items. Shipping included in the quoted price.');
+
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch('http://localhost:8000/api/procurement/quotations/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(quoteData)
+      });
+      if (res.ok) {
+        showAlert(isDraft ? 'Quotation Draft Saved!' : 'Quotation Submitted Successfully!');
+        setLineItems([]);
+        setTaxRate(18);
+        setValidity('30 Days');
+        setPaymentTerms('Payment terms: 20 days net. Standard 1-year warranty included for all furniture items. Shipping included in the quoted price.');
+      } else {
+        const errorData = await res.json();
+        showAlert('Error submitting quotation: ' + JSON.stringify(errorData));
+      }
+    } catch (err) {
+      showAlert('Network error connecting to backend.');
+    }
   };
 
   return (

@@ -13,12 +13,14 @@ from .models import (
     InvoiceItem,
     InvoiceTimelineEvent,
     ActivityLog,
+    Quotation,
 )
 from .serializers import (
     ApprovalSerializer,
     PurchaseOrderSerializer,
     InvoiceSerializer,
     ActivityLogSerializer,
+    QuotationSerializer,
 )
 
 class MockDashboardView(APIView):
@@ -238,3 +240,24 @@ class MockActivityLogsView(APIView):
         logs = ActivityLog.objects.all().order_by('-id')
         serializer = ActivityLogSerializer(logs, many=True)
         return Response(serializer.data)
+
+class QuotationSubmitView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        quotes = Quotation.objects.all().order_by('-id')
+        serializer = QuotationSerializer(quotes, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = QuotationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            ActivityLog.objects.create(
+                title="Quotation Submitted",
+                desc=f"Vendor submitted a new quote for RFQ #{serializer.instance.rfq_id}.",
+                category="Quotations",
+                time="Just now"
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

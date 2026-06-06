@@ -101,3 +101,27 @@ class ActivityLog(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.category}"
+
+class Quotation(models.Model):
+    rfq_id = models.CharField(max_length=50)
+    tax_rate = models.FloatField(default=18.0)
+    validity = models.CharField(max_length=100, default='30 Days')
+    payment_terms = models.TextField(blank=True, default='')
+    subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
+    gst_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
+    grand_total = models.DecimalField(max_digits=12, decimal_places=2, default=0.0)
+    status = models.CharField(max_length=50, default='Submitted')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Quote for RFQ {self.rfq_id} - {self.status}"
+
+class QuotationLineItem(models.Model):
+    quotation = models.ForeignKey(Quotation, related_name='line_items', on_delete=models.CASCADE)
+    desc = models.CharField(max_length=255)
+    qty = models.IntegerField()
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2)
+    delivery_days = models.IntegerField(default=10)
+
+    def __str__(self):
+        return f"{self.desc} - Price: {self.unit_price}"
