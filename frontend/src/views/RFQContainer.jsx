@@ -57,19 +57,36 @@ export default function RFQContainer() {
     setAttachments([...attachments, ...files.map(f => f.name)]);
   };
 
-  const handleSave = (isDraft) => {
+  const handleSave = async (isDraft) => {
     const data = {
       title,
       category,
       deadline,
       description,
-      lineItems,
-      assignedVendors,
-      attachments,
-      status: isDraft ? 'Draft' : 'Sent'
+      line_items: lineItems.map(item => ({ item: item.desc, qty: item.qty, unit: item.unit })),
+      assigned_vendors: assignedVendors.map(v => v.name),
+      status: isDraft ? 'Draft' : 'Open'
     };
-    console.log('Saving RFQ:', data);
-    alert(isDraft ? 'RFQ Saved as Draft successfully!' : 'RFQ sent to assigned vendors successfully!');
+
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch('http://localhost:8000/api/rfqs/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+      const resData = await res.json();
+      if (res.ok) {
+        alert(isDraft ? 'RFQ Saved as Draft successfully!' : `RFQ '${title}' created and published successfully!`);
+      } else {
+        alert('Error saving RFQ: ' + (resData.error || JSON.stringify(resData)));
+      }
+    } catch (err) {
+      alert('Network error connecting to backend.');
+    }
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function VendorMgmt() {
   const [filter, setFilter] = useState('All');
@@ -9,6 +9,37 @@ export default function VendorMgmt() {
     { id: 3, init: 'FL', name: 'FastLog Transport', category: 'Logistics', gst: '27AABCS1429Bz0', contact: '+91 88562 11XXX', status: 'Blocked' },
     { id: 4, init: 'MS', name: 'Modular Solutions', category: 'Furniture', gst: '27AABCS1429Bz0', contact: '+91 74125 66XXX', status: 'Pending' },
   ]);
+
+  useEffect(() => {
+    const fetchVendors = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const statusParam = filter === 'All' ? '' : filter.toLowerCase();
+        const res = await fetch(`http://localhost:8000/api/vendors/?status=${statusParam}&search=${search}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const formatted = data.map(v => ({
+            id: v.id,
+            init: v.vendor_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
+            name: v.vendor_name,
+            category: v.category,
+            gst: v.gst_no,
+            contact: v.contact_no,
+            status: v.status
+          }));
+          setVendors(formatted);
+        }
+      } catch (err) {
+        console.error('Error fetching vendors from backend:', err);
+      }
+    };
+    fetchVendors();
+  }, [filter, search]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newVendor, setNewVendor] = useState({ name: '', category: 'Constructions', gst: '', contact: '', status: 'Active' });
 

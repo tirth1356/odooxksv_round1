@@ -36,15 +36,15 @@ export default function Dashboard({ userRole, onLogout }) {
   };
 
   const allNavItems = [
-    { name: 'Dashboard', icon: 'dashboard', roles: ['Procurement Officer', 'Vendor', 'Manager / Approver', 'Admin'] },
+    { name: 'Dashboard', icon: 'dashboard', roles: ['Procurement Officer', 'Vendor', 'Manager', 'Admin'] },
     { name: 'Vendors', icon: 'groups', roles: ['Procurement Officer', 'Admin'] },
-    { name: 'RFQs', icon: 'request_quote', roles: ['Procurement Officer', 'Vendor', 'Manager / Approver'] },
+    { name: 'RFQs', icon: 'request_quote', roles: ['Procurement Officer', 'Vendor', 'Manager'] },
     { name: 'Quotations', icon: 'receipt_long', roles: ['Procurement Officer', 'Vendor'] },
-    { name: 'Approvals', icon: 'fact_check', roles: ['Manager / Approver'] },
-    { name: 'Purchase Orders', icon: 'shopping_cart', roles: ['Procurement Officer', 'Vendor', 'Manager / Approver'] },
+    { name: 'Approvals', icon: 'fact_check', roles: ['Manager'] },
+    { name: 'Purchase Orders', icon: 'shopping_cart', roles: ['Procurement Officer', 'Vendor', 'Manager'] },
     { name: 'Invoices', icon: 'description', roles: ['Procurement Officer', 'Vendor'] },
     { name: 'Reports', icon: 'analytics', roles: ['Admin'] },
-    { name: 'Activity', icon: 'history', roles: ['Procurement Officer', 'Manager / Approver', 'Admin'] },
+    { name: 'Activity', icon: 'history', roles: ['Procurement Officer', 'Manager', 'Admin'] },
   ];
 
   const navItems = allNavItems.filter(item => item.roles.includes(userRole));

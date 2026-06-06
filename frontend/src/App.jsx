@@ -317,7 +317,7 @@ function App() {
                         >
                           <option value="Procurement Officer">Procurement Officer</option>
                           <option value="Vendor">Vendor</option>
-                          <option value="Manager / Approver">Manager / Approver</option>
+                          <option value="Manager">Manager / Approver</option>
                           <option value="Admin">Admin</option>
                         </select>
                       </div>
