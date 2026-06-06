@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDialog } from '../context/DialogContext';
+import html2pdf from 'html2pdf.js';
 
 export default function QuotationComparison({ onBack }) {
   const { showAlert } = useDialog();
@@ -65,7 +66,19 @@ export default function QuotationComparison({ onBack }) {
           </div>
           <div className="flex gap-3">
             <button 
-              onClick={() => showAlert('Exporting Comparison to PDF...')} 
+              onClick={() => {
+                showAlert('Preparing PDF download...');
+                const element = document.getElementById('comparison-canvas');
+                if(!element) return;
+                const opt = {
+                  margin:       0.5,
+                  filename:     'Quotation_Comparison.pdf',
+                  image:        { type: 'jpeg', quality: 0.98 },
+                  html2canvas:  { scale: 2 },
+                  jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+                };
+                html2pdf().set(opt).from(element).save();
+              }} 
               className="flex items-center gap-2 px-4 py-2 border border-outline-variant rounded-lg text-body-sm text-on-surface hover:bg-surface-container-high transition-colors"
             >
               <span className="material-symbols-outlined text-[18px]">download</span>
@@ -88,7 +101,7 @@ export default function QuotationComparison({ onBack }) {
         </div>
       ) : (
       <>
-      <div className="max-w-container-max mx-auto">
+      <div id="comparison-canvas" className="max-w-container-max mx-auto">
         <div className="grid grid-cols-4 gap-0 border border-outline-variant rounded-xl overflow-hidden bg-surface-container-low shadow-2xl">
 
           <div className="bg-surface-container-high/50 p-6 border-b border-r border-outline-variant flex items-center">

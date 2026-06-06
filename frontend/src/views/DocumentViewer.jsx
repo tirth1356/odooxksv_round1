@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDialog } from '../context/DialogContext';
+import html2pdf from 'html2pdf.js';
 
 export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' }) {
   const { showAlert } = useDialog();
@@ -121,7 +122,20 @@ export default function DocumentViewer({ setActiveTab, documentType = 'Invoice' 
 
         <div className="flex flex-wrap gap-3">
           <button 
-            onClick={() => triggerToast('The invoice has been downloaded as PDF.')}
+            onClick={() => {
+              triggerToast('Preparing PDF download...');
+              const element = document.querySelector('.invoice-canvas');
+              const opt = {
+                margin:       0.5,
+                filename:     isPO ? `PO-${docData?.po_number || '2024-0068'}.pdf` : `INV-${docData?.invoice_number || '2024-0091'}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+              };
+              html2pdf().set(opt).from(element).save().then(() => {
+                triggerToast('The document has been downloaded as PDF.');
+              });
+            }}
             className="flex items-center gap-2 px-4 py-2 bg-surface-container-high text-on-surface border border-outline-variant rounded-lg hover:border-primary hover:text-primary transition-all text-body-sm"
           >
             <span className="material-symbols-outlined text-[20px]">download</span>

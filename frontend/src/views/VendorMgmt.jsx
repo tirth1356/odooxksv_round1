@@ -217,7 +217,34 @@ export default function VendorMgmt() {
               />
             </div>
             <button 
-              onClick={() => showAlert('Exporting Vendor List to CSV...')}
+              onClick={() => {
+                showAlert('Exporting Vendor List to CSV...');
+                if (vendors.length === 0) return;
+                
+                const headers = ['Vendor Name', 'Category', 'GST Number', 'Contact Number', 'Status'];
+                const csvRows = [headers.join(',')];
+                
+                filteredVendors.forEach(v => {
+                  const row = [
+                    `"${v.name.replace(/"/g, '""')}"`,
+                    `"${v.category.replace(/"/g, '""')}"`,
+                    `"${v.gst.replace(/"/g, '""')}"`,
+                    `"${v.contact.replace(/"/g, '""')}"`,
+                    `"${v.status.replace(/"/g, '""')}"`
+                  ];
+                  csvRows.push(row.join(','));
+                });
+                
+                const csvString = csvRows.join('\n');
+                const blob = new Blob([csvString], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'Vendor_List.csv';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }}
               className="flex items-center gap-2 px-4 py-2 border border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors rounded text-body-sm font-bold"
             >
               <span className="material-symbols-outlined text-[18px]">download</span>

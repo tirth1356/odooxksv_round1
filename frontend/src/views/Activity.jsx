@@ -55,6 +55,30 @@ export default function Activity({ setActiveTab }) {
 
   const handleExportCSV = () => {
     showAlert('Exporting immutable audit trail to CSV file...');
+    if (logs.length === 0) return;
+    
+    const headers = ['Title', 'Description', 'Category', 'Time'];
+    const csvRows = [headers.join(',')];
+    
+    logs.forEach(log => {
+      const row = [
+        `"${log.title.replace(/"/g, '""')}"`,
+        `"${log.desc.replace(/"/g, '""')}"`,
+        `"${log.category.replace(/"/g, '""')}"`,
+        `"${log.time.replace(/"/g, '""')}"`
+      ];
+      csvRows.push(row.join(','));
+    });
+    
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'Audit_Trail.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const filteredLogs = logs.filter(log => {
