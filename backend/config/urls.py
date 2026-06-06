@@ -16,8 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from apps.procurement.views import MockDashboardView
+from apps.vendors.views import MockVendorListView
+from apps.rfqs.views import MockRFQView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('apps.authentication.urls')),
+    path('api/dashboard/', MockDashboardView.as_view(), name='mock_dashboard'),
+    path('api/vendors/', MockVendorListView.as_view(), name='mock_vendors'),
+    path('api/rfqs/', MockRFQView.as_view(), name='mock_rfqs'),
 ]
